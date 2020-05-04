@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  eventing-api:
+    build: eventing-net-core
+    ports:
+      - 8080:80
