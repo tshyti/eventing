@@ -1,6 +1,6 @@
 export default interface RouteType {
   name: string;
-  component: React.ReactNode;
+  component: React.ComponentType;
   focusedIconName: string;
   unfocusedIconName: string;
 }

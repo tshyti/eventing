@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,6 +7,7 @@ import profileRoute from '../routeConfigs/profile';
 import savedRoute from '../routeConfigs/saved';
 import homeRoute from '../routeConfigs/home';
 import categoriesRoute from '../routeConfigs/categories';
+import theme from '../utils/theme';
 
 const tabRoutes: RouteType[] = [
   homeRoute,
@@ -42,11 +42,12 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Tab.Navigator
         tabBarOptions={{
-          activeTintColor: 'white',
-          inactiveTintColor: '#999',
+          activeTintColor: theme.primaryColor,
+          inactiveTintColor: theme.primaryColor,
           style: {
-            backgroundColor: 'black',
+            backgroundColor: theme.backgroundColor,
           },
+          showLabel: false,
         }}
       >
         {tabScreens}
