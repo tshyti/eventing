@@ -2,10 +2,9 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import RouteType from '../routeConfigs/routeType';
 import profileRoute from '../routeConfigs/profile';
-import searchRoute from '../routeConfigs/search';
 import savedRoute from '../routeConfigs/saved';
 import homeRoute from '../routeConfigs/home';
 import categoriesRoute from '../routeConfigs/categories';
@@ -13,7 +12,6 @@ import categoriesRoute from '../routeConfigs/categories';
 const tabRoutes: RouteType[] = [
   homeRoute,
   categoriesRoute,
-  searchRoute,
   savedRoute,
   profileRoute,
 ];
@@ -34,8 +32,12 @@ const tabScreens = tabRoutes.map(route => {
       key={route.name}
       name={route.name}
       options={{
-        tabBarIcon: ({ color, size }) => (
-          <FontAwesome name={route.iconName} color={color} size={size} />
+        tabBarIcon: ({ color, size, focused }) => (
+          <MaterialCommunityIcons
+            name={focused ? route.focusedIconName : route.unfocusedIconName}
+            color={color}
+            size={size}
+          />
         ),
       }}
       component={test}
@@ -48,8 +50,11 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Tab.Navigator
         tabBarOptions={{
-          activeTintColor: 'tomato',
-          inactiveTintColor: 'gray',
+          activeTintColor: 'white',
+          inactiveTintColor: '#999',
+          style: {
+            backgroundColor: 'black',
+          },
         }}
       >
         {tabScreens}

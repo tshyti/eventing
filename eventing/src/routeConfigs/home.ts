@@ -2,7 +2,8 @@ import RouteType from './routeType';
 
 const homeRoute: RouteType = {
   name: 'Home',
-  iconName: 'home',
+  focusedIconName: 'home',
+  unfocusedIconName: 'home-outline',
   component: null,
 };
 

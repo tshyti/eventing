@@ -2,7 +2,8 @@ import RouteType from './routeType';
 
 const categoriesRoute: RouteType = {
   name: 'Categories',
-  iconName: 'th-large',
+  focusedIconName: 'view-dashboard',
+  unfocusedIconName: 'view-dashboard-outline',
   component: null,
 };
 

@@ -2,7 +2,8 @@ import RouteType from './routeType';
 
 const profileRoute: RouteType = {
   name: 'Profile',
-  iconName: 'user',
+  focusedIconName: 'account',
+  unfocusedIconName: 'account-outline',
   component: null,
 };
 

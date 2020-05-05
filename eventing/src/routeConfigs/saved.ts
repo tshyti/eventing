@@ -2,7 +2,8 @@ import RouteType from './routeType';
 
 const savedRoute: RouteType = {
   name: 'Saved',
-  iconName: 'heart',
+  focusedIconName: 'heart',
+  unfocusedIconName: 'heart-outline',
   component: null,
 };
 
