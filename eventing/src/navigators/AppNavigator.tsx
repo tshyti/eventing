@@ -18,14 +18,6 @@ const tabRoutes: RouteType[] = [
 
 const Tab = createBottomTabNavigator();
 
-function test({ navigation }: any) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
-    </View>
-  );
-}
-
 const tabScreens = tabRoutes.map(route => {
   return (
     <Tab.Screen
@@ -40,7 +32,7 @@ const tabScreens = tabRoutes.map(route => {
           />
         ),
       }}
-      component={test}
+      component={route.component}
     />
   );
 });
