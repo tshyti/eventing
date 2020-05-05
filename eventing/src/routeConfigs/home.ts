@@ -1,7 +1,7 @@
 import RouteType from './routeType';
 
 const homeRoute: RouteType = {
-  name: 'Events',
+  name: 'Home',
   iconName: 'home',
   component: null,
 };

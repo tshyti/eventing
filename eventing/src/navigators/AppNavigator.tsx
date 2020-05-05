@@ -2,18 +2,20 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AntDesign } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import RouteType from '../routeConfigs/routeType';
-import HomeRoute from '../routeConfigs/home';
-import ProfileRoute from '../routeConfigs/profile';
-import FavoritesRoute from '../routeConfigs/favorites';
-import SearchRoute from '../routeConfigs/search';
+import profileRoute from '../routeConfigs/profile';
+import searchRoute from '../routeConfigs/search';
+import savedRoute from '../routeConfigs/saved';
+import homeRoute from '../routeConfigs/home';
+import categoriesRoute from '../routeConfigs/categories';
 
 const tabRoutes: RouteType[] = [
-  HomeRoute,
-  ProfileRoute,
-  FavoritesRoute,
-  SearchRoute,
+  homeRoute,
+  categoriesRoute,
+  searchRoute,
+  savedRoute,
+  profileRoute,
 ];
 
 const Tab = createBottomTabNavigator();
@@ -33,7 +35,7 @@ const tabScreens = tabRoutes.map(route => {
       name={route.name}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <AntDesign name={route.iconName} color={color} size={size} />
+          <FontAwesome name={route.iconName} color={color} size={size} />
         ),
       }}
       component={test}
