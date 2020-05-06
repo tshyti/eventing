@@ -15,7 +15,7 @@ export default function HomeScreen() {
         ]}
         renderItem={({ item }) => (
           <TouchableCategory
-            style={{ marginLeft: 7 }}
+            style={{ marginLeft: 10 }}
             iconName={item.iconName}
             text={item.text}
           />
@@ -23,9 +23,11 @@ export default function HomeScreen() {
         keyExtractor={item => item.iconName}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        // style={{ height: '10%' }}
       />
-      <View style={{ marginHorizontal: 5 }}>
+      <View style={{ marginHorizontal: 10, marginTop: 10 }}>
+        <EventCard />
+        <EventCard />
+        <EventCard />
         <EventCard />
       </View>
     </RootLayout>
