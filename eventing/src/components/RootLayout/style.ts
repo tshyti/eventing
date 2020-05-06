@@ -4,7 +4,7 @@ import theme from '../../utils/theme';
 
 export default StyleSheet.create({
   clearNotificationBar: {
-    paddingTop: Constants.statusBarHeight + 10,
+    paddingTop: Constants.statusBarHeight,
     backgroundColor: theme.backgroundColor,
   },
 });
