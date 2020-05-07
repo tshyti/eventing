@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'native-base';
+import { View } from 'native-base';
 import TouchableCategory from '../../components/Home/TouchableCategory';
 import RootLayout from '../../components/RootLayout/RootLayout';
 import { FlatList } from 'react-native';
@@ -23,6 +23,7 @@ export default function HomeScreen() {
         keyExtractor={item => item.iconName}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
+        style={{ marginTop: 5 }}
       />
       <View style={{ marginHorizontal: 10, marginTop: 10 }}>
         <EventCard />

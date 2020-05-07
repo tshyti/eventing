@@ -48,6 +48,7 @@ export default function AppNavigator() {
             backgroundColor: theme.backgroundColor,
           },
           showLabel: false,
+          keyboardHidesTabBar: true,
         }}
       >
         {tabScreens}

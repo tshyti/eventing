@@ -1,7 +1,8 @@
 import React from 'react';
-import { Container, Content, Text } from 'native-base';
+import { Container, Content, Header, Item, Icon, Input } from 'native-base';
 import style from './style';
 import { StyleProp, ViewStyle } from 'react-native';
+import theme from '../../utils/theme';
 
 export interface RootLayoutProps {
   children: React.ReactNode;
@@ -10,7 +11,18 @@ export interface RootLayoutProps {
 
 export default function RootLayout({ children, styles }: RootLayoutProps) {
   return (
-    <Container style={[style.clearNotificationBar, styles]}>
+    <Container style={[style.backgroundColor, styles]}>
+      <Header searchBar rounded transparent>
+        <Item>
+          <Icon name="ios-search" style={{ color: theme.primaryColor }} />
+          <Input placeholder="Search" />
+          <Icon
+            name="sliders-h"
+            type="FontAwesome5"
+            style={{ color: theme.primaryColor }}
+          />
+        </Item>
+      </Header>
       <Content>{children}</Content>
     </Container>
   );
