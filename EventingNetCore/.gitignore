@@ -4,7 +4,6 @@
 project.lock.json
 .DS_Store
 *.pyc
-
 # Visual Studio Code
 .vscode
 
@@ -28,6 +27,7 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+*.blob
 
 # Visual Studio 2015
 .vs/

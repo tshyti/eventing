@@ -28,7 +28,8 @@ namespace Domain.Services
             var identityUser = new IdentityUser
             {
                 Email = email,
-                UserName = "test1"
+                UserName = "test1",
+                
             };
             
             var createdUser = await _userManager.CreateAsync(identityUser, "TestPassword1.");
