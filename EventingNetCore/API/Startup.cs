@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Config;
@@ -19,6 +21,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
+using Domain.Entities.Users;
+using Domain.RequestModels;
+using FluentValidation.AspNetCore;
+using Microsoft.OpenApi.Models;
 
 namespace API
 {
@@ -34,13 +41,36 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var mappingConfig = new MapperConfiguration(cfg =>
+                cfg.AddMaps(new [] {
+                    "Domain",
+                }));
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+            
             services.AddCors();
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(fv => 
+                fv.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(CreateUserRequest))));
+            
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Eventing API", Version = "v1"}); 
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
+            
             services.AddDbContext<EventingContext>(options =>
             {
                 options.UseNpgsql(Configuration["ConnectionString"]);
             });
-            services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                {
+                    options.SignIn.RequireConfirmedAccount = true;
+                    options.Password.RequireNonAlphanumeric = false;
+                })
                 .AddEntityFrameworkStores<EventingContext>();
             
             // configure jwt token options
@@ -76,6 +106,17 @@ namespace API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseStaticFiles();
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
             
             if (env.IsDevelopment())
             {

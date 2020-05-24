@@ -4,8 +4,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common.Config;
+using Domain.Entities.Users;
 using Domain.IServices;
+using Domain.RequestModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -16,23 +19,23 @@ namespace Domain.Services
     public class AuthenticationService: IAuthenticationService
     {
         private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
-        private readonly UserManager<IdentityUser> _userManager;
-        public AuthenticationService(IOptions<JwtBearerTokenSettings> jwtTokenOptions, UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
+        public AuthenticationService(
+            IOptions<JwtBearerTokenSettings> jwtTokenOptions, 
+            UserManager<ApplicationUser> userManager,
+            IMapper mapper)
         {
             _jwtBearerTokenSettings = jwtTokenOptions.Value;
             _userManager = userManager;
+            _mapper = mapper;
         }
         
-        public async Task<string> Register(string email)
+        public async Task<string> Register(CreateUserRequest user)
         {
-            var identityUser = new IdentityUser
-            {
-                Email = email,
-                UserName = "test1",
-                
-            };
+            var applicationUser = _mapper.Map<ApplicationUser>(user);
             
-            var createdUser = await _userManager.CreateAsync(identityUser, "TestPassword1.");
+            var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
             return createdUser.Succeeded ? "great" : "not great";
         }
 
@@ -53,7 +56,7 @@ namespace Domain.Services
             return null;
         }
 
-        private string GenerateJwtToken(IdentityUser user)
+        private string GenerateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var secret = Encoding.ASCII.GetBytes(_jwtBearerTokenSettings.SecretKey);

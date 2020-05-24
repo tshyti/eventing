@@ -2,10 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Domain.Entities;
+using Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Domain
 {
-    public partial class EventingContext : DbContext
+    public partial class EventingContext: IdentityDbContext<ApplicationUser>
     {
         public EventingContext()
         {
