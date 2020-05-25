@@ -44,10 +44,7 @@ namespace Domain.Services
             var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
             if (createdUser.Succeeded)
             {
-                var userInDb = await _dbContext.AspNetUsers.FirstOrDefaultAsync(u => u.Email == applicationUser.Email);
-                var roleInDb = await _dbContext.AspNetRoles.FirstOrDefaultAsync(r => r.Name == UserRoleNames.Common);
-                await _dbContext.AspNetUserRoles.AddAsync(new AspNetUserRoles{RoleId = roleInDb.Id, UserId = userInDb.Id});
-                await _dbContext.SaveChangesAsync();
+                await _userManager.AddToRoleAsync(applicationUser, UserRoleNames.Common);
             }
             if (!createdUser.Succeeded)
             {
@@ -57,7 +54,7 @@ namespace Domain.Services
 
         public async Task<string> Login(LoginRequest request)
         {
-            var userInDb = await _dbContext.AspNetUsers.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var userInDb = await _userManager.FindByEmailAsync(request.Email);
             if (userInDb == null)
             {
                 throw new HttpResponseException{Status = 404, Value = new
@@ -76,10 +73,9 @@ namespace Domain.Services
                     Password = "Password is incorrect"
                 }};
             }
-            var userRole = await _dbContext.AspNetUserRoles
-                .Include(m => m.Role)
-                .FirstOrDefaultAsync(ur => ur.UserId == userInDb.Id);
-            return GenerateJwtToken(userInDb, userRole.Role.NormalizedName);
+
+            var userRoles = await _userManager.GetRolesAsync(userInDb);
+            return GenerateJwtToken(userInDb, userRoles[0]);
         }
 
         private string GenerateJwtToken(ApplicationUser user, string roleName)

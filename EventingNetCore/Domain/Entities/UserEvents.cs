@@ -10,6 +10,6 @@ namespace Domain.Entities
         public int Eventid { get; set; }
 
         public virtual Events Event { get; set; }
-        public virtual AspNetUsers User { get; set; }
+        public virtual ApplicationUser User { get; set; }
     }
 }
