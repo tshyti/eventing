@@ -55,24 +55,34 @@ namespace Domain.Services
             }
         }
 
-        public async Task<string> Login(string email)
+        public async Task<string> Login(LoginRequest request)
         {
-            var userInDb = await _userManager.FindByEmailAsync(email);
-            if (userInDb == null) return null;
-            var verifyPassResult =
-                _userManager.PasswordHasher.VerifyHashedPassword
-                    (userInDb, userInDb.PasswordHash, "TestPassword1.");
-            if (verifyPassResult == PasswordVerificationResult.Success)
+            var userInDb = await _dbContext.AspNetUsers.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (userInDb == null)
             {
-                // add roles when registering 
-                var userRoles = await _userManager.GetRolesAsync(userInDb);
-                return GenerateJwtToken(userInDb);
+                throw new HttpResponseException{Status = 404, Value = new
+                {
+                    Email = "Email doesn't exist"
+                }};
             }
             
-            return null;
+            var verifyPassResult =
+                _userManager.PasswordHasher.VerifyHashedPassword
+                    (userInDb, userInDb.PasswordHash, request.Password);
+            if (verifyPassResult != PasswordVerificationResult.Success)
+            {
+                throw new HttpResponseException{Status = 400, Value = new
+                {
+                    Password = "Password is incorrect"
+                }};
+            }
+            var userRole = await _dbContext.AspNetUserRoles
+                .Include(m => m.Role)
+                .FirstOrDefaultAsync(ur => ur.UserId == userInDb.Id);
+            return GenerateJwtToken(userInDb, userRole.Role.NormalizedName);
         }
 
-        private string GenerateJwtToken(ApplicationUser user)
+        private string GenerateJwtToken(ApplicationUser user, string roleName)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var secret = Encoding.ASCII.GetBytes(_jwtBearerTokenSettings.SecretKey);
@@ -83,6 +93,7 @@ namespace Domain.Services
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Email, user.Email), 
+                    new Claim(ClaimTypes.Role, roleName), 
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(_jwtBearerTokenSettings.ExpiryTimeInSeconds),
                 SigningCredentials = new SigningCredentials

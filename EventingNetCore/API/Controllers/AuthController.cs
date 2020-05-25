@@ -22,11 +22,10 @@ namespace API.Controllers
             return Ok();
         }
 
-        [Route("Login")]
-        [HttpPost]
-        public async Task<IActionResult> Login()
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody]LoginRequest request)
         {
-            var message = await _authService.Login("test@test.com");
+            var message = await _authService.Login(request);
             return Ok(message);
         }
     }
