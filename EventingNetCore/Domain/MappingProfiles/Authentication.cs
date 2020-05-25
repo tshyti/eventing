@@ -9,7 +9,8 @@ namespace Domain.MappingProfiles
     {
         public Authentication()
         {
-            CreateMap<CreateUserRequest, ApplicationUser>();
+            CreateMap<CreateUserRequest, ApplicationUser>()
+                .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
         }
     }
 }
