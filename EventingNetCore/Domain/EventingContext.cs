@@ -1,11 +1,14 @@
 ﻿using System;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Domain.Entities;
+using Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Domain
 {
-    public partial class EventingContext : DbContext
+    public partial class EventingContext: IdentityDbContext<ApplicationUser>
     {
         public EventingContext()
         {
@@ -16,10 +19,19 @@ namespace Domain
         {
         }
 
+        public virtual DbSet<AspNetRoleClaims> AspNetRoleClaims { get; set; }
+        public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
+        public virtual DbSet<AspNetUserClaims> AspNetUserClaims { get; set; }
+        public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
+        public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
+        public virtual DbSet<AspNetUserTokens> AspNetUserTokens { get; set; }
+        public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<EventTags> EventTags { get; set; }
+        public virtual DbSet<Events> Events { get; set; }
         public virtual DbSet<PgBuffercache> PgBuffercache { get; set; }
         public virtual DbSet<PgStatStatements> PgStatStatements { get; set; }
-        public virtual DbSet<Test> Test { get; set; }
-        public virtual DbSet<TestType> TestType { get; set; }
+        public virtual DbSet<Tags> Tags { get; set; }
+        public virtual DbSet<UserEvents> UserEvents { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,6 +41,134 @@ namespace Domain
         {
             modelBuilder.HasPostgresExtension("pg_buffercache")
                 .HasPostgresExtension("pg_stat_statements");
+
+            modelBuilder.Entity<AspNetRoleClaims>(entity =>
+            {
+                entity.HasIndex(x => x.RoleId);
+
+                entity.Property(e => e.RoleId).IsRequired();
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.AspNetRoleClaims)
+                    .HasForeignKey(x => x.RoleId);
+            });
+
+            modelBuilder.Entity<AspNetRoles>(entity =>
+            {
+                entity.HasIndex(x => x.NormalizedName)
+                    .HasName("RoleNameIndex")
+                    .IsUnique();
+
+                entity.Property(e => e.Name).HasMaxLength(256);
+
+                entity.Property(e => e.NormalizedName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<AspNetUserClaims>(entity =>
+            {
+                entity.HasIndex(x => x.UserId);
+
+                entity.Property(e => e.UserId).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserClaims)
+                    .HasForeignKey(x => x.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUserLogins>(entity =>
+            {
+                entity.HasKey(x => new { x.LoginProvider, x.ProviderKey });
+
+                entity.HasIndex(x => x.UserId);
+
+                entity.Property(e => e.UserId).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserLogins)
+                    .HasForeignKey(x => x.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUserRoles>(entity =>
+            {
+                entity.HasKey(x => new { x.UserId, x.RoleId });
+
+                entity.HasIndex(x => x.RoleId);
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.AspNetUserRoles)
+                    .HasForeignKey(x => x.RoleId);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserRoles)
+                    .HasForeignKey(x => x.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUserTokens>(entity =>
+            {
+                entity.HasKey(x => new { x.UserId, x.LoginProvider, x.Name });
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserTokens)
+                    .HasForeignKey(x => x.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUsers>(entity =>
+            {
+                entity.HasIndex(x => x.NormalizedEmail)
+                    .HasName("EmailIndex");
+
+                entity.HasIndex(x => x.NormalizedUserName)
+                    .HasName("UserNameIndex")
+                    .IsUnique();
+
+                entity.Property(e => e.Email).HasMaxLength(256);
+
+                entity.Property(e => e.LockoutEnd).HasColumnType("timestamp with time zone");
+
+                entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+
+                entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+
+                entity.Property(e => e.UserName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<EventTags>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.Eventid).HasColumnName("eventid");
+
+                entity.Property(e => e.Tagid).HasColumnName("tagid");
+
+                entity.HasOne(d => d.Event)
+                    .WithMany()
+                    .HasForeignKey(x => x.Eventid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("EventTags_eventid_fkey");
+
+                entity.HasOne(d => d.Tag)
+                    .WithMany()
+                    .HasForeignKey(x => x.Tagid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("EventTags_tagid_fkey");
+            });
+
+            modelBuilder.Entity<Events>(entity =>
+            {
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.Property(e => e.Location)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Price).HasColumnType("money");
+            });
 
             modelBuilder.Entity<PgBuffercache>(entity =>
             {
@@ -118,24 +258,36 @@ namespace Domain
                     .HasColumnType("oid");
             });
 
-            modelBuilder.Entity<Test>(entity =>
+            modelBuilder.Entity<Tags>(entity =>
             {
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(250);
-
-                entity.HasOne(d => d.TestType)
-                    .WithMany(p => p.Test)
-                    .HasForeignKey(x => x.TestTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_test_type");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
             });
 
-            modelBuilder.Entity<TestType>(entity =>
+            modelBuilder.Entity<UserEvents>(entity =>
             {
-                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+                entity.HasNoKey();
 
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Eventid).HasColumnName("eventid");
+
+                entity.Property(e => e.Userid)
+                    .IsRequired()
+                    .HasColumnName("userid");
+
+                entity.HasOne(d => d.Event)
+                    .WithMany()
+                    .HasForeignKey(x => x.Eventid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("userevents_eventid_fkey");
+
+                entity.HasOne(d => d.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.Userid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("userevents_userid_fkey");
             });
 
             OnModelCreatingPartial(modelBuilder);
