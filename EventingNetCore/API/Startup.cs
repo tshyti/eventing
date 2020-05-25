@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using API.ActionFilters;
 using Common.Config;
 using Domain;
 using Domain.IServices;
@@ -49,7 +50,8 @@ namespace API
             services.AddSingleton(mapper);
             
             services.AddCors();
-            services.AddControllers().AddFluentValidation(fv => 
+            services.AddControllers(options =>options.Filters.Add(new HttpResponseExceptionFilter()))
+                .AddFluentValidation(fv => 
                 fv.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(CreateUserRequest))));
             
             // Register the Swagger generator, defining 1 or more Swagger documents
@@ -70,6 +72,7 @@ namespace API
                 {
                     options.SignIn.RequireConfirmedAccount = true;
                     options.Password.RequireNonAlphanumeric = false;
+                    
                 })
                 .AddEntityFrameworkStores<EventingContext>();
             

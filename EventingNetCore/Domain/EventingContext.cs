@@ -3,12 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Domain.Entities;
 using Domain.Entities.Users;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Domain
 {
-    public partial class EventingContext: IdentityDbContext<ApplicationUser>
+    public partial class EventingContext : DbContext
     {
         public EventingContext()
         {
@@ -25,17 +24,13 @@ namespace Domain
         public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUserTokens> AspNetUserTokens { get; set; }
-        public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<ApplicationUser> AspNetUsers { get; set; }
         public virtual DbSet<EventTags> EventTags { get; set; }
         public virtual DbSet<Events> Events { get; set; }
         public virtual DbSet<PgBuffercache> PgBuffercache { get; set; }
         public virtual DbSet<PgStatStatements> PgStatStatements { get; set; }
         public virtual DbSet<Tags> Tags { get; set; }
         public virtual DbSet<UserEvents> UserEvents { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -112,7 +107,7 @@ namespace Domain
                     .HasForeignKey(x => x.UserId);
             });
 
-            modelBuilder.Entity<AspNetUsers>(entity =>
+            modelBuilder.Entity<ApplicationUser>(entity =>
             {
                 entity.HasIndex(x => x.NormalizedEmail)
                     .HasName("EmailIndex");

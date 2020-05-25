@@ -5,12 +5,15 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Common;
 using Common.Config;
+using Common.Exceptions;
 using Domain.Entities.Users;
 using Domain.IServices;
 using Domain.RequestModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,23 +23,36 @@ namespace Domain.Services
     {
         private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly EventingContext _dbContext;
         private readonly IMapper _mapper;
         public AuthenticationService(
             IOptions<JwtBearerTokenSettings> jwtTokenOptions, 
             UserManager<ApplicationUser> userManager,
+            EventingContext dbContext,
             IMapper mapper)
         {
             _jwtBearerTokenSettings = jwtTokenOptions.Value;
             _userManager = userManager;
+            _dbContext = dbContext;
             _mapper = mapper;
         }
         
-        public async Task<string> Register(CreateUserRequest user)
+        public async Task Register(CreateUserRequest user)
         {
             var applicationUser = _mapper.Map<ApplicationUser>(user);
             
             var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
-            return createdUser.Succeeded ? "great" : "not great";
+            if (createdUser.Succeeded)
+            {
+                var userInDb = await _dbContext.AspNetUsers.FirstOrDefaultAsync(u => u.Email == applicationUser.Email);
+                var roleInDb = await _dbContext.AspNetRoles.FirstOrDefaultAsync(r => r.Name == UserRoleNames.Common);
+                await _dbContext.AspNetUserRoles.AddAsync(new AspNetUserRoles{RoleId = roleInDb.Id, UserId = userInDb.Id});
+                await _dbContext.SaveChangesAsync();
+            }
+            if (!createdUser.Succeeded)
+            {
+                throw new HttpResponseException{Status = 400, Value = createdUser.Errors};
+            }
         }
 
         public async Task<string> Login(string email)

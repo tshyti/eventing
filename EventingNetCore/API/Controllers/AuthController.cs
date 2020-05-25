@@ -18,8 +18,8 @@ namespace API.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody]CreateUserRequest request)
         {
-            var message = await _authService.Register(request);
-            return Ok(message);
+            await _authService.Register(request);
+            return Ok();
         }
 
         [Route("Login")]
