@@ -8,6 +8,7 @@
     "start": "next start -p 3030"
   },
   "dependencies": {
+    "@ant-design/colors": "^4.0.0",
     "@ant-design/icons": "^4.0.6",
     "@next/bundle-analyzer": "^9.1.4",
     "@reduxjs/toolkit": "^1.3.6",
