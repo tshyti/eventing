@@ -35,7 +35,9 @@
     "jsx-a11y/label-has-associated-control": "off",
     "react/no-unescaped-entities": "off",
     "jsx-a11y/accessible-emoji": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "import/no-unresolved": "off",
+    "import/prefer-default-export": "off"
   },
   "settings": {
     "import/resolver": {
