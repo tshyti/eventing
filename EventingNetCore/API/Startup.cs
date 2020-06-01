@@ -6,10 +6,14 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using API.ActionFilters;
+using AutoMapper;
 using Common.Config;
 using Domain;
+using Domain.Entities.Users;
 using Domain.IServices;
+using Domain.RequestModels;
 using Domain.Services;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,118 +26,101 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using AutoMapper;
-using Domain.Entities.Users;
-using Domain.RequestModels;
-using FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
 
-namespace API
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
+namespace API {
+    public class Startup {
+        public Startup (IConfiguration configuration) {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            var mappingConfig = new MapperConfiguration(cfg =>
-                cfg.AddMaps(new [] {
+        public void ConfigureServices (IServiceCollection services) {
+            var mappingConfig = new MapperConfiguration (cfg =>
+                cfg.AddMaps (new [] {
                     "Domain",
                 }));
-            IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
-            
-            services.AddCors();
-            services.AddControllers(options =>options.Filters.Add(new HttpResponseExceptionFilter()))
-                .AddFluentValidation(fv => 
-                fv.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(CreateUserRequest))));
-            
+            IMapper mapper = mappingConfig.CreateMapper ();
+            services.AddSingleton (mapper);
+
+            services.AddCors ();
+            services.AddControllers (options => options.Filters.Add (new HttpResponseExceptionFilter ()))
+                .AddFluentValidation (fv =>
+                    fv.RegisterValidatorsFromAssembly (Assembly.GetAssembly (typeof (CreateUserRequest))));
+
             // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Eventing API", Version = "v1"}); 
+            services.AddSwaggerGen (c => {
+                c.SwaggerDoc ("v1", new OpenApiInfo { Title = "Eventing API", Version = "v1" });
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                var xmlPath = Path.Combine (AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments (xmlPath);
             });
-            
-            services.AddDbContext<EventingContext>(options =>
-            {
-                options.UseNpgsql(Configuration["ConnectionString"]);
+
+            services.AddDbContext<EventingContext> (options => {
+                options.UseNpgsql (Environment.GetEnvironmentVariable ("CONNECTION_STRING"));
             });
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-                {
+            services.AddIdentity<ApplicationUser, IdentityRole> (options => {
                     options.SignIn.RequireConfirmedAccount = true;
                     options.Password.RequireNonAlphanumeric = false;
-                    
+
                 })
-                .AddEntityFrameworkStores<EventingContext>();
-            
+                .AddEntityFrameworkStores<EventingContext> ();
+
             // configure jwt token options
-            var jwtSection = Configuration.GetSection("JwtBearerTokenSettings");
-            services.Configure<JwtBearerTokenSettings>(jwtSection);
+            var jwtSection = Configuration.GetSection ("JwtBearerTokenSettings");
+            services.Configure<JwtBearerTokenSettings> (jwtSection);
 
-            var jwtBearerTokenSettings = jwtSection.Get<JwtBearerTokenSettings>();
-            var key = Encoding.ASCII.GetBytes(jwtBearerTokenSettings.SecretKey);
+            var jwtBearerTokenSettings = jwtSection.Get<JwtBearerTokenSettings> ();
+            var key = Encoding.ASCII.GetBytes (jwtBearerTokenSettings.SecretKey);
 
-            services.AddAuthentication(options =>
-            {
+            services.AddAuthentication (options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
+            }).AddJwtBearer (options => {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
+                options.TokenValidationParameters = new TokenValidationParameters {
                     ValidateIssuer = true,
                     ValidIssuer = jwtBearerTokenSettings.Issuer,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new SymmetricSecurityKey (key),
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
             });
 
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IAuthenticationService, AuthenticationService> ();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        public void Configure (IApplicationBuilder app, IWebHostEnvironment env) {
+            app.UseCors (x => x.AllowAnyOrigin ().AllowAnyMethod ().AllowAnyHeader ());
             // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseStaticFiles();
-            app.UseSwagger();
+            app.UseStaticFiles ();
+            app.UseSwagger ();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            app.UseSwaggerUI (c => {
+                c.SwaggerEndpoint ("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
-            
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
+
+            if (env.IsDevelopment ()) {
+                app.UseDeveloperExceptionPage ();
             }
 
             // app.UseHttpsRedirection();
 
-            app.UseRouting();
+            app.UseRouting ();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthentication ();
+            app.UseAuthorization ();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints (endpoints => { endpoints.MapControllers (); });
         }
     }
 }
