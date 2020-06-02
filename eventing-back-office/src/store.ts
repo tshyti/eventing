@@ -4,11 +4,9 @@ import {
   ThunkAction,
   Action,
 } from '@reduxjs/toolkit';
-import testReducer from 'slices/test/testSlice';
 import authReducer from 'slices/auth/authSlice';
 
 const rootReducer = combineReducers({
-  test: testReducer,
   auth: authReducer,
 });
 

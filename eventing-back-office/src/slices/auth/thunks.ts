@@ -1,0 +1,44 @@
+import { AxiosError, AxiosResponse } from 'axios';
+import { AppThunk } from 'store';
+import axios from 'utils/axiosConfig';
+import Router from 'next/router';
+import { UserRequest, UserLoginResponse, User } from './models';
+import { loadingLogin, loginUserFail, loginUserSuccess } from './authSlice';
+
+export function loginUser(payload: UserRequest): AppThunk {
+  return async (dispatch) => {
+    dispatch(loadingLogin(true));
+    try {
+      const res: AxiosResponse<string> = await axios.post(
+        'auth/login',
+        payload
+      );
+      const user = getUserObject(res.data);
+      dispatch(loginUserSuccess(user));
+      Router.push('/auth');
+    } catch (e) {
+      const {
+        response: { data },
+      } = e as AxiosError<{ [key: string]: string }>;
+
+      const key = Object.keys(data)[0];
+      dispatch(loginUserFail({ field: key, error: data[key] }));
+    } finally {
+      dispatch(loadingLogin(false));
+    }
+  };
+}
+
+function getUserObject(token: string): User {
+  const loginResponse = decodeJWT(token);
+  return {
+    firstName: loginResponse.unique_name,
+    lastName: loginResponse.family_name,
+    role: loginResponse.role,
+    token,
+  };
+}
+
+function decodeJWT(token: string): UserLoginResponse {
+  return JSON.parse(window.atob(token.split('.')[1]));
+}

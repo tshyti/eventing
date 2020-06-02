@@ -19,14 +19,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Domain.Services
 {
-    public class AuthenticationService: IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly EventingContext _dbContext;
         private readonly IMapper _mapper;
         public AuthenticationService(
-            IOptions<JwtBearerTokenSettings> jwtTokenOptions, 
+            IOptions<JwtBearerTokenSettings> jwtTokenOptions,
             UserManager<ApplicationUser> userManager,
             EventingContext dbContext,
             IMapper mapper)
@@ -36,11 +36,11 @@ namespace Domain.Services
             _dbContext = dbContext;
             _mapper = mapper;
         }
-        
+
         public async Task Register(CreateUserRequest user)
         {
             var applicationUser = _mapper.Map<ApplicationUser>(user);
-            
+
             var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
             if (createdUser.Succeeded)
             {
@@ -48,7 +48,7 @@ namespace Domain.Services
             }
             if (!createdUser.Succeeded)
             {
-                throw new HttpResponseException{Status = 400, Value = createdUser.Errors};
+                throw new HttpResponseException { Status = 400, Value = createdUser.Errors };
             }
         }
 
@@ -57,21 +57,29 @@ namespace Domain.Services
             var userInDb = await _userManager.FindByEmailAsync(request.Email);
             if (userInDb == null)
             {
-                throw new HttpResponseException{Status = 404, Value = new
+                throw new HttpResponseException
                 {
-                    Email = "Email doesn't exist"
-                }};
+                    Status = 401,
+                    Value = new
+                    {
+                        Email = "Email doesn't exist!"
+                    }
+                };
             }
-            
+
             var verifyPassResult =
                 _userManager.PasswordHasher.VerifyHashedPassword
                     (userInDb, userInDb.PasswordHash, request.Password);
             if (verifyPassResult != PasswordVerificationResult.Success)
             {
-                throw new HttpResponseException{Status = 400, Value = new
+                throw new HttpResponseException
                 {
-                    Password = "Password is incorrect"
-                }};
+                    Status = 401,
+                    Value = new
+                    {
+                        Password = "Password is incorrect!"
+                    }
+                };
             }
 
             var userRoles = await _userManager.GetRolesAsync(userInDb);
@@ -82,14 +90,15 @@ namespace Domain.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var secret = Encoding.ASCII.GetBytes(_jwtBearerTokenSettings.SecretKey);
-            
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email), 
-                    new Claim(ClaimTypes.Role, roleName), 
+                    new Claim(ClaimTypes.Name, user.Firstname),
+                    new Claim(ClaimTypes.Surname, user.Lastname),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, roleName),
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(_jwtBearerTokenSettings.ExpiryTimeInSeconds),
                 SigningCredentials = new SigningCredentials

@@ -8,7 +8,7 @@ import { RootState } from 'store';
 
 export default function withAuth(Component: NextPage) {
   function Wrapper(props) {
-    const token = useSelector<RootState>((state) => state.auth.token);
+    const token = useSelector<RootState>((state) => state.auth.user.token);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
