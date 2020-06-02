@@ -19,6 +19,7 @@
     "dayjs": "1.8.24",
     "esm": "^3.2.25",
     "next": "9.3.4",
+    "next-redux-wrapper": "^6.0.1",
     "postcss-preset-env": "^6.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
