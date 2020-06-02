@@ -1,13 +1,32 @@
 import { Form, Input, Button, Row, Col, Avatar } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserRequest, UserRequestFailed } from 'slices/auth/models';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from 'slices/auth/thunks';
+import { useForm } from 'antd/lib/form/util';
+import { RootState } from 'store';
+import { useEffect } from 'react';
 
 export default function Login() {
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-  };
+  const dispatch = useDispatch();
 
-  function onFinishFailed(values) {
-    console.log(values);
+  const loadingLogin = useSelector<RootState, boolean>(
+    (state) => state.auth.loadingLogin
+  );
+  const errors = useSelector<RootState, UserRequestFailed>(
+    (state) => state.auth.userRequestFailed
+  );
+
+  const [form] = useForm();
+
+  useEffect(() => {
+    if (errors) {
+      form.setFields([{ name: errors.field, errors: [errors.error] }]);
+    }
+  }, [errors]);
+
+  function onFinish(values: UserRequest) {
+    dispatch(loginUser(values));
   }
 
   return (
@@ -23,20 +42,22 @@ export default function Login() {
           icon={<LockOutlined />}
         />
         <h1 style={{ textAlign: 'center' }}>Sign In</h1>
-        <Form
-          name="normal_login"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-        >
+        <Form name="normal_login" form={form} onFinish={onFinish}>
           <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Please input your Username!' }]}
+            name="email"
+            rules={[
+              { required: true, message: 'Please input your Email!' },
+              {
+                pattern: new RegExp(
+                  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                ),
+                message: 'Please input a correct Email!',
+                validateTrigger: 'onBlur',
+              },
+            ]}
+            validateTrigger={['onBlur', 'onChange']}
           >
-            <Input
-              size="large"
-              prefix={<UserOutlined />}
-              placeholder="Username"
-            />
+            <Input size="large" prefix={<UserOutlined />} placeholder="Email" />
           </Form.Item>
           <Form.Item
             name="password"
@@ -50,8 +71,14 @@ export default function Login() {
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0 }}>
-            <Button block size="large" type="primary" htmlType="submit">
-              Log in
+            <Button
+              block
+              size="large"
+              type="primary"
+              htmlType="submit"
+              loading={loadingLogin}
+            >
+              Log In
             </Button>
           </Form.Item>
           <Form.Item>

@@ -36,7 +36,7 @@ const compose = (plugins) => ({
 
 const withBundleAnalyzer = require('@next/bundle-analyzer');
 
-module.exports = compose([
+const webP = compose([
   [
     withBundleAnalyzer,
     {
@@ -44,3 +44,10 @@ module.exports = compose([
     },
   ],
 ]);
+
+module.exports = {
+  ...webP,
+  env: {
+    API_ENDPOINT: process.env.API_ENDPOINT,
+  },
+};

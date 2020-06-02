@@ -37,7 +37,10 @@
     "jsx-a11y/accessible-emoji": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "import/no-unresolved": "off",
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "no-useless-escape": "off",
+    "camelcase": "off",
+    "no-use-before-define": "off"
   },
   "settings": {
     "import/resolver": {
