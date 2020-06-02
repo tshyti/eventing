@@ -1,31 +1,38 @@
 using System.Threading.Tasks;
 using Domain.IServices;
+using Domain.RequestModels;
 
 namespace Domain.Services
 {
     public class UsersService : IUsersService
     {
-        Task IUsersService.CreateUser()
+        private readonly EventingContext _dbContext;
+        public UsersService(EventingContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task CreateUser()
         {
             throw new System.NotImplementedException();
         }
 
-        Task IUsersService.DeleteUser()
+        public async Task DeleteUser()
         {
             throw new System.NotImplementedException();
         }
 
-        Task IUsersService.GetAllUsers()
+        public async Task GetAllUsers(PaginationRequest request)
         {
             throw new System.NotImplementedException();
         }
 
-        Task IUsersService.GetUserById()
+        public async Task GetUserById()
         {
             throw new System.NotImplementedException();
         }
 
-        Task IUsersService.UpdateUser()
+        public async Task UpdateUser()
         {
             throw new System.NotImplementedException();
         }

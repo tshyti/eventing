@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Domain.MappingProfiles
 {
-    public class Authentication: Profile
+    public class Authentication : Profile
     {
         public Authentication()
         {
-            CreateMap<CreateUserRequest, ApplicationUser>()
+            CreateMap<UserRegisterRequest, ApplicationUser>()
                 .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
         }
     }

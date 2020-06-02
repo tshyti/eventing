@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Domain.RequestModels
 {
-    public class CreateUserRequest
+    public class UserRegisterRequest
     {
         public string Firstname { get; set; }
         public string Lastname { get; set; }
@@ -12,7 +12,7 @@ namespace Domain.RequestModels
         public string Password { get; set; }
     }
 
-    public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
+    public class CreateUserRequestValidator : AbstractValidator<UserRegisterRequest>
     {
         public CreateUserRequestValidator()
         {

@@ -14,5 +14,11 @@ namespace API.Controllers
         {
             _usersService = usersService;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] PaginationRequest request)
+        {
+            var users = await _usersService.GetAllUsers(request);
+        }
     }
 }

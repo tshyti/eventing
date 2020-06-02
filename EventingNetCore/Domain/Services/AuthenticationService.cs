@@ -37,10 +37,9 @@ namespace Domain.Services
             _mapper = mapper;
         }
 
-        public async Task Register(CreateUserRequest user)
+        public async Task Register(UserRegisterRequest user)
         {
             var applicationUser = _mapper.Map<ApplicationUser>(user);
-
             var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
             if (createdUser.Succeeded)
             {

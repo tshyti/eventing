@@ -52,7 +52,7 @@ namespace API
             services.AddCors();
             services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddFluentValidation(fv =>
-                   fv.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(CreateUserRequest))));
+                   fv.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(UserRegisterRequest))));
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

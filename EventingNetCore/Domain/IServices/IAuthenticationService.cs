@@ -6,7 +6,7 @@ namespace Domain.IServices
 {
     public interface IAuthenticationService
     {
-       Task Register(CreateUserRequest email);
-       Task<string> Login(LoginRequest email);
+        Task Register(UserRegisterRequest user);
+        Task<string> Login(LoginRequest request);
     }
 }
