@@ -68,6 +68,7 @@ namespace API
             {
                 options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING"));
             });
+
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -102,6 +103,7 @@ namespace API
             });
 
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IUsersService, UsersService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
