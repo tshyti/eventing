@@ -1,12 +1,18 @@
 using System.Threading.Tasks;
+using Domain.DTOs;
 using Domain.IServices;
 using Domain.RequestModels;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Domain.Helpers;
+using Domain.Entities.Users;
 
 namespace Domain.Services
 {
     public class UsersService : IUsersService
     {
         private readonly EventingContext _dbContext;
+
         public UsersService(EventingContext dbContext)
         {
             _dbContext = dbContext;
@@ -22,9 +28,10 @@ namespace Domain.Services
             throw new System.NotImplementedException();
         }
 
-        public async Task GetAllUsers(PaginationRequest request)
+        public async Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request)
         {
-            throw new System.NotImplementedException();
+            var users = await _dbContext.Users.GetPaged<ApplicationUser>(request);
+            return new PagedResultDTO<UserDTO>();
         }
 
         public async Task GetUserById()

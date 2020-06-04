@@ -7,7 +7,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController
+    public class UsersController: ControllerBase
     {
         private readonly IUsersService _usersService;
         public UsersController(IUsersService usersService)
@@ -19,6 +19,7 @@ namespace API.Controllers
         public async Task<IActionResult> Get([FromQuery] PaginationRequest request)
         {
             var users = await _usersService.GetAllUsers(request);
+            return Ok(users);
         }
     }
 }
