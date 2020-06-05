@@ -21,5 +21,12 @@ namespace API.Controllers
             var users = await _usersService.GetAllUsers(request);
             return Ok(users);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var user = await _usersService.GetUserById(id);
+            return Ok(user);
+        }
     }
 }

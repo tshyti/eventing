@@ -5,6 +5,7 @@ using Domain.RequestModels;
 using System.Linq;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Domain.Helpers;
 using Domain.Entities.Users;
@@ -36,13 +37,23 @@ namespace Domain.Services
 
         public async Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request)
         {
-            var users = await _dbContext.Users.ProjectTo<UserDTO>(_mapper.ConfigurationProvider).GetPaged<UserDTO>(request);
+            var users = await _dbContext.Users
+                .ProjectTo<UserDTO>(_mapper.ConfigurationProvider).GetPaged<UserDTO>(request);
             return users;
         }
 
-        public async Task GetUserById()
+        public async Task<UserDTO> GetUserById(string id)
         {
-            throw new System.NotImplementedException();
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user is null)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "User not found!"
+                };
+            }
+            return _mapper.Map<ApplicationUser, UserDTO>(user);
         }
 
         public async Task UpdateUser()
