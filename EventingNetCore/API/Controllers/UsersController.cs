@@ -36,5 +36,12 @@ namespace API.Controllers
             await _usersService.UpdateUser(id, user);
             return Ok();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Put(string id)
+        {
+            await _usersService.DeleteUser(id);
+            return Ok();
+        }
     }
 }

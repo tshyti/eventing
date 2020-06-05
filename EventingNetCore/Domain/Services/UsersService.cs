@@ -10,30 +10,24 @@ using Domain.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 using Domain.Helpers;
 using Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Services
 {
     public class UsersService : IUsersService
     {
         private readonly EventingContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
         public UsersService(
             EventingContext dbContext,
+            UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
             _mapper = mapper;
-        }
-
-        public async Task CreateUser()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public async Task DeleteUser()
-        {
-            throw new System.NotImplementedException();
         }
 
         public async Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request)
@@ -56,6 +50,11 @@ namespace Domain.Services
             }
             return _mapper.Map<ApplicationUser, UserDTO>(user);
         }
+        
+        public async Task CreateUser()
+        {
+            throw new System.NotImplementedException();
+        }
 
         public async Task UpdateUser(string id, UpdateUserDTO updateUserDto)
         {
@@ -71,6 +70,21 @@ namespace Domain.Services
 
             _mapper.Map(updateUserDto, userInDb);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteUser(string id)
+        {
+            var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (userInDb is null)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "User not found!"
+                };
+            }
+
+            await _userManager.DeleteAsync(userInDb);
         }
     }
 }
