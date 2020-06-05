@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Domain.DTOs.User;
 using Domain.IServices;
 using Domain.RequestModels;
+using Domain.RequestModels.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -38,10 +39,17 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Put(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             await _usersService.DeleteUser(id);
             return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] CreateUserDTO createUserDto)
+        {
+            var user = await _usersService.CreateUser(createUserDto);
+            return Ok(user);
         }
     }
 }

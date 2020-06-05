@@ -11,9 +11,9 @@ namespace Domain.RequestModels.User
         public string Password { get; set; }
     }
 
-    public class CreateUserRequestValidator : AbstractValidator<UserRegisterRequest>
+    public class UserRegisterRequestValidator : AbstractValidator<UserRegisterRequest>
     {
-        public CreateUserRequestValidator()
+        public UserRegisterRequestValidator()
         {
             RuleFor(m => m.Firstname).NotEmpty().NotNull().MinimumLength(2);
             RuleFor(m => m.Lastname).NotEmpty().NotNull().MinimumLength(2);

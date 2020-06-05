@@ -2,7 +2,8 @@ namespace Common
 {
     public static class UserRoleNames
     {
-        public static readonly string Common = "Common";
-        public static readonly string Admin = "Admin";
+        public const string Common = "Common";
+        public const string Admin = "Admin";
+        public const string EventCreator = "EventCreator";
     }
 }

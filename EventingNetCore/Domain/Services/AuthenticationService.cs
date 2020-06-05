@@ -39,10 +39,16 @@ namespace Domain.Services
         public async Task Register(UserRegisterRequest user)
         {
             var applicationUser = _mapper.Map<ApplicationUser>(user);
-            var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
+            await RegisterApplicationUser(applicationUser, user.Password);
+        }
+
+        public async Task RegisterApplicationUser(ApplicationUser applicationUser, 
+            string password, string roleName = UserRoleNames.Common)
+        {
+            var createdUser = await _userManager.CreateAsync(applicationUser, password);
             if (createdUser.Succeeded)
             {
-                await _userManager.AddToRoleAsync(applicationUser, UserRoleNames.Common);
+                await _userManager.AddToRoleAsync(applicationUser, roleName);
             }
             if (!createdUser.Succeeded)
             {

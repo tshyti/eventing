@@ -13,6 +13,8 @@ namespace Domain.MappingProfiles
         {
             CreateMap<UserRegisterRequest, ApplicationUser>()
                 .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
+            CreateMap<CreateUserDTO, ApplicationUser>()
+                .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
             CreateMap<ApplicationUser, UserDTO>();
             CreateMap<UpdateUserDTO, ApplicationUser>();
         }

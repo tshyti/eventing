@@ -5,11 +5,13 @@ using Domain.RequestModels;
 using System.Linq;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Common;
 using Common.Exceptions;
 using Domain.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 using Domain.Helpers;
 using Domain.Entities.Users;
+using Domain.RequestModels.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Services
@@ -17,15 +19,18 @@ namespace Domain.Services
     public class UsersService : IUsersService
     {
         private readonly EventingContext _dbContext;
+        private readonly IAuthenticationService _authService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
         public UsersService(
             EventingContext dbContext,
             UserManager<ApplicationUser> userManager,
+            IAuthenticationService authService,
             IMapper mapper)
         {
             _dbContext = dbContext;
+            _authService = authService;
             _userManager = userManager;
             _mapper = mapper;
         }
@@ -51,9 +56,25 @@ namespace Domain.Services
             return _mapper.Map<ApplicationUser, UserDTO>(user);
         }
         
-        public async Task CreateUser()
+        public async Task<UserDTO> CreateUser(CreateUserDTO createUserDto)
         {
-            throw new System.NotImplementedException();
+            var roleInDb = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Id == createUserDto.RoleId);
+            
+            if (roleInDb is null)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "Role not found!"
+                };
+            }
+
+            var userToSave = _mapper.Map<ApplicationUser>(createUserDto);
+            await _authService.RegisterApplicationUser(userToSave, createUserDto.Password, roleInDb.Name);
+            
+            var createdUser = await _dbContext.Users.ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
+            return createdUser;
         }
 
         public async Task UpdateUser(string id, UpdateUserDTO updateUserDto)
