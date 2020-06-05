@@ -3,6 +3,8 @@ using Domain.DTOs;
 using Domain.IServices;
 using Domain.RequestModels;
 using System.Linq;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Domain.Helpers;
 using Domain.Entities.Users;
@@ -12,10 +14,14 @@ namespace Domain.Services
     public class UsersService : IUsersService
     {
         private readonly EventingContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public UsersService(EventingContext dbContext)
+        public UsersService(
+            EventingContext dbContext,
+            IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public async Task CreateUser()
@@ -30,8 +36,8 @@ namespace Domain.Services
 
         public async Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request)
         {
-            var users = await _dbContext.Users.GetPaged<ApplicationUser>(request);
-            return new PagedResultDTO<UserDTO>();
+            var users = await _dbContext.Users.ProjectTo<UserDTO>(_mapper.ConfigurationProvider).GetPaged<UserDTO>(request);
+            return users;
         }
 
         public async Task GetUserById()

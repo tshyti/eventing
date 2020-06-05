@@ -9,8 +9,8 @@ namespace Domain.Helpers
 {
     public static class Pagination
     {
-
-        public static async Task<PagedResultDTO<T>> GetPaged<T>(this IQueryable<T> query, PaginationRequest paging)
+        public static async Task<PagedResultDTO<T>> GetPaged<T>(this IQueryable<T> query,
+            PaginationRequest paging) where T: class
         {
             var pagedResult = new PagedResultDTO<T>
             {
@@ -26,13 +26,14 @@ namespace Domain.Helpers
 
             return pagedResult;
         }
-        public static int GetPageCount(PaginationRequest paging, int maxItems)
+
+        private static int GetPageCount(PaginationRequest paging, int maxItems)
         {
             var pageCount = (double)maxItems / paging.PageSize;
             return (int)Math.Ceiling(pageCount);
         }
 
-        public static int GetSkipCount(PaginationRequest paging)
+        private static int GetSkipCount(PaginationRequest paging)
         {
             return (paging.PageNumber - 1) * paging.PageSize;
         }

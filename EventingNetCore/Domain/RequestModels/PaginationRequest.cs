@@ -4,16 +4,43 @@ namespace Domain.RequestModels
 {
     public class PaginationRequest
     {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-    }
-
-    public class PaginationRequestValidator : AbstractValidator<PaginationRequest>
-    {
-        public PaginationRequestValidator()
+        private int _pageNumber;
+        private int _pageSize;
+        
+        public int PageNumber
         {
-            RuleFor(m => m.PageNumber).GreaterThan(0);
-            RuleFor(m => m.PageSize).GreaterThan(0);
+            get => _pageNumber;
+            set
+            {
+                if (value < 1)
+                {
+                    _pageNumber = 1;
+                }
+                else
+                {
+                    _pageNumber = value;
+                }
+            }
+        }
+
+        public int PageSize
+        {
+            get => _pageSize;
+            set 
+            {
+                if (value < 1)
+                {
+                    _pageSize = 1;
+                }
+                else if (value > 100)
+                {
+                    _pageSize = 100;
+                }
+                else
+                {
+                    _pageSize = value;
+                }
+            } 
         }
     }
 }

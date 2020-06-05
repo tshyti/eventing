@@ -1,16 +1,17 @@
 using AutoMapper;
+using Domain.DTOs;
 using Domain.Entities.Users;
 using Domain.RequestModels;
-using Microsoft.AspNetCore.Identity;
 
 namespace Domain.MappingProfiles
 {
-    public class Authentication : Profile
+    public class UsersMappingProfile: Profile
     {
-        public Authentication()
+        public UsersMappingProfile()
         {
             CreateMap<UserRegisterRequest, ApplicationUser>()
                 .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
+            CreateMap<ApplicationUser, UserDTO>();
         }
     }
 }

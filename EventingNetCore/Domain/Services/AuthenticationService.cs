@@ -23,18 +23,16 @@ namespace Domain.Services
     {
         private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly EventingContext _dbContext;
         private readonly IMapper _mapper;
         public AuthenticationService(
             IOptions<JwtBearerTokenSettings> jwtTokenOptions,
             UserManager<ApplicationUser> userManager,
-            EventingContext dbContext,
             IMapper mapper)
         {
             _jwtBearerTokenSettings = jwtTokenOptions.Value;
             _userManager = userManager;
-            _dbContext = dbContext;
             _mapper = mapper;
+            
         }
 
         public async Task Register(UserRegisterRequest user)
