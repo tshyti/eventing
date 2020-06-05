@@ -1,8 +1,7 @@
-using System;
 using System.Text.RegularExpressions;
 using FluentValidation;
 
-namespace Domain.RequestModels
+namespace Domain.RequestModels.User
 {
     public class UserRegisterRequest
     {

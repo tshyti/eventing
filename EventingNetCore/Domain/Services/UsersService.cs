@@ -6,6 +6,7 @@ using System.Linq;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Common.Exceptions;
+using Domain.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 using Domain.Helpers;
 using Domain.Entities.Users;
@@ -56,9 +57,20 @@ namespace Domain.Services
             return _mapper.Map<ApplicationUser, UserDTO>(user);
         }
 
-        public async Task UpdateUser()
+        public async Task UpdateUser(string id, UpdateUserDTO updateUserDto)
         {
-            throw new System.NotImplementedException();
+            var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (userInDb is null)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "User not found!"
+                };
+            }
+
+            _mapper.Map(updateUserDto, userInDb);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

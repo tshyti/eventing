@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Domain.DTOs.User;
 using Domain.IServices;
 using Domain.RequestModels;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,13 @@ namespace API.Controllers
         {
             var user = await _usersService.GetUserById(id);
             return Ok(user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(string id, [FromBody] UpdateUserDTO user)
+        {
+            await _usersService.UpdateUser(id, user);
+            return Ok();
         }
     }
 }

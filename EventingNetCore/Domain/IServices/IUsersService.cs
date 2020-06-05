@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Domain.RequestModels;
 using Domain.DTOs;
+using Domain.DTOs.User;
 
 namespace Domain.IServices
 {
@@ -8,8 +9,8 @@ namespace Domain.IServices
     {
         Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request);
         Task<UserDTO> GetUserById(string id);
+        Task UpdateUser(string userId, UpdateUserDTO updateUserDto);
         Task CreateUser();
         Task DeleteUser();
-        Task UpdateUser();
     }
 }

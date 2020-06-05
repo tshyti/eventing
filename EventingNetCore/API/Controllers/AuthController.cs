@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Domain.IServices;
 using Domain.RequestModels;
+using Domain.RequestModels.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

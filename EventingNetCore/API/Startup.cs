@@ -12,6 +12,7 @@ using Domain;
 using Domain.Entities.Users;
 using Domain.IServices;
 using Domain.RequestModels;
+using Domain.RequestModels.User;
 using Domain.Services;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

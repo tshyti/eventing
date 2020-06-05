@@ -11,6 +11,7 @@ using Common.Exceptions;
 using Domain.Entities.Users;
 using Domain.IServices;
 using Domain.RequestModels;
+using Domain.RequestModels.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
