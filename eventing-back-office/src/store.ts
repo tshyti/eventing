@@ -7,11 +7,13 @@ import {
   AnyAction,
   createStore,
 } from '@reduxjs/toolkit';
-import { MakeStore, createWrapper, Context, HYDRATE } from 'next-redux-wrapper';
+import { createWrapper, Context, HYDRATE } from 'next-redux-wrapper';
 import authReducer from 'slices/auth/authSlice';
+import globalReducer from 'slices/global/globalSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  global: globalReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
