@@ -21,16 +21,7 @@ export default function withAuth(Component: NextPage) {
 
     if (loading) {
       return (
-        <div
-          style={{
-            display: 'flex',
-            minHeight: '100vh',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 50 }} spin />} />
-        </div>
+        
       );
     }
 

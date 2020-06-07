@@ -2,7 +2,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { AppThunk } from 'store';
 import axios from 'utils/axiosConfig';
 import Router from 'next/router';
-import { UserRequest, UserLoginResponse, User } from './models';
+import { UserRequest, UserLoginResponse, UserAuthDetails } from './models';
 import { loadingLogin, loginUserFail, loginUserSuccess } from './authSlice';
 
 export function loginUser(payload: UserRequest): AppThunk {
@@ -13,7 +13,10 @@ export function loginUser(payload: UserRequest): AppThunk {
         'auth/login',
         payload
       );
+
       const user = getUserObject(res.data);
+      localStorage.setItem('user', JSON.stringify(user));
+
       dispatch(loginUserSuccess(user));
       Router.push('/auth');
     } catch (e) {
@@ -29,7 +32,7 @@ export function loginUser(payload: UserRequest): AppThunk {
   };
 }
 
-function getUserObject(token: string): User {
+function getUserObject(token: string): UserAuthDetails {
   const loginResponse = decodeJWT(token);
   return {
     firstName: loginResponse.unique_name,

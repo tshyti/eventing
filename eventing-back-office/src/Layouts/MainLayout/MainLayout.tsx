@@ -36,7 +36,7 @@ export default function MainLayout({ children }) {
             setCollapsed={dispatchCollapsed}
           />
         </Header>
-        <Content style={{ margin: '0 16px' }}>{children}Test</Content>
+        <Content style={{ margin: '0 16px' }}>{children}</Content>
         <Footer style={{ textAlign: 'center' }}>
           Eventing ©{new Date().getFullYear()}
         </Footer>

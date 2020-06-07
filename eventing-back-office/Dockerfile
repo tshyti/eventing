@@ -1,4 +1,4 @@
-FROM node:12 AS build-env
+FROM node:10
 WORKDIR /backoffice
 
 # Install PM2 globally

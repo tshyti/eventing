@@ -1,10 +1,10 @@
 export interface SliceState {
-  user: User;
+  user?: UserAuthDetails;
   userRequestFailed?: UserRequestFailed;
   loadingLogin: boolean;
 }
 
-export interface User {
+export interface UserAuthDetails {
   token: string;
   firstName: string;
   lastName: string;
