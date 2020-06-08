@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosInterceptorManager, AxiosRequestConfig } from 'axios';
+import { wrapper } from 'store';
 
 const instance = axios.create({
   baseURL: process.env.API_ENDPOINT,

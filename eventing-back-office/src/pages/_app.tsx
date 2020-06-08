@@ -9,11 +9,15 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { loginUserSuccess } from 'slices/auth/authSlice';
 import useDidUpdate from 'hooks/didUpdateEffect';
+import axios from 'utils/axiosConfig';
 
 function MyApp({ Component, pageProps }) {
   const { pathname, events } = useRouter();
   const userRole = useSelector<RootState, string>(
     (state) => state.auth.user?.role
+  );
+  const userToken = useSelector<RootState, string>(
+    (state) => state.auth.user?.token
   );
 
   const [appLoading, setAppLoading] = useState(isPageAuthorized(pathname));
@@ -36,6 +40,15 @@ function MyApp({ Component, pageProps }) {
       events.off('routeChangeStart', () => false);
     };
   }, [userRole]);
+
+  useEffect(() => {
+    if (didUpdate) {
+      axios.interceptors.request.use((req) => {
+        req.headers.Authorization = `Bearer ${userToken}`;
+        return req;
+      });
+    }
+  }, [userToken]);
 
   function handleRouteChange(url: string, roleName?: string) {
     const route = routesConfig.find((r) => r.path.includes(url));
