@@ -1,6 +1,4 @@
-import 'antd/dist/antd.css';
-import '../styles/vars.css';
-import '../styles/global.css';
+import '../styles/global.less';
 import { useRouter } from 'next/router';
 import { wrapper, RootState } from 'store';
 import routesConfig from 'utils/routesConfig';
