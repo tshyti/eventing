@@ -15,7 +15,7 @@ function MyApp({ Component, pageProps }) {
   );
 
   const [appLoading, setAppLoading] = useState(isPageAuthorized());
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   useEffect(() => {
     if (isPageAuthorized()) {

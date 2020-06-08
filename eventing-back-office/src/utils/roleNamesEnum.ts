@@ -1,6 +1,6 @@
 enum RoleNamesEnum {
-  Admin = 'admin',
-  Common = 'common',
+  Admin = 'Admin',
+  Common = 'Common',
 }
 
 export default RoleNamesEnum;

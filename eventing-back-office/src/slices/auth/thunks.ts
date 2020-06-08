@@ -2,6 +2,8 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { AppThunk } from 'store';
 import axios from 'utils/axiosConfig';
 import Router from 'next/router';
+import { routeRedirectsFromLogin } from 'utils/routesConfig';
+import RoleNamesEnum from 'utils/roleNamesEnum';
 import { UserRequest, UserLoginResponse, UserAuthDetails } from './models';
 import { loadingLogin, loginUserFail, loginUserSuccess } from './authSlice';
 
@@ -18,7 +20,8 @@ export function loginUser(payload: UserRequest): AppThunk {
       localStorage.setItem('user', JSON.stringify(user));
 
       dispatch(loginUserSuccess(user));
-      Router.push('/auth');
+
+      Router.push(routeRedirectsFromLogin[RoleNamesEnum[user.role]]);
     } catch (e) {
       const {
         response: { data },

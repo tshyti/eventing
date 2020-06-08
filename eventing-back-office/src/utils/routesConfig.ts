@@ -24,4 +24,8 @@ const testRoute: RouteConfig = {
 
 const routes: RouteConfig[] = [usersRoute, testRoute];
 
+export const routeRedirectsFromLogin = {
+  [RoleNamesEnum.Admin]: '/users',
+};
+
 export default routes;
