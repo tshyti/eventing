@@ -1,7 +1,7 @@
 import '../styles/global.less';
 import { useRouter } from 'next/router';
 import { wrapper, RootState } from 'store';
-import routesConfig from 'utils/routesConfig';
+import routesConfig, { isPageAuthorized } from 'utils/routesConfig';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { UserAuthDetails } from 'slices/auth/models';
@@ -16,14 +16,14 @@ function MyApp({ Component, pageProps }) {
     (state) => state.auth.user?.role
   );
 
-  const [appLoading, setAppLoading] = useState(isPageAuthorized());
+  const [appLoading, setAppLoading] = useState(isPageAuthorized(pathname));
   const didUpdate = useDidUpdate();
   const dispatch = useDispatch();
 
   // protect page on initial app load
   useEffect(() => {
     const user = restoreUserSession();
-    if (isPageAuthorized()) {
+    if (isPageAuthorized(pathname)) {
       handleRouteChange(pathname, user?.role);
     }
   }, []);
@@ -61,15 +61,6 @@ function MyApp({ Component, pageProps }) {
       dispatch(loginUserSuccess(user));
     }
     return user;
-  }
-
-  function isPageAuthorized() {
-    const route = routesConfig.find((r) => r.path.includes(pathname));
-    // meaning route does not have auth
-    if (!route) {
-      return false;
-    }
-    return true;
   }
 
   if (appLoading) {

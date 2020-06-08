@@ -21,7 +21,7 @@ export function loginUser(payload: UserRequest): AppThunk {
 
       dispatch(loginUserSuccess(user));
 
-      Router.push(routeRedirectsFromLogin[RoleNamesEnum[user.role]]);
+      Router.replace(routeRedirectsFromLogin[RoleNamesEnum[user.role]]);
     } catch (e) {
       const {
         response: { data },

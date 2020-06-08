@@ -28,4 +28,16 @@ export const routeRedirectsFromLogin = {
   [RoleNamesEnum.Admin]: '/users',
 };
 
+export function isPageAuthorized(pathname: string) {
+  if (pathname === '/') {
+    return false;
+  }
+  const route = routes.find((r) => r.path.includes(pathname));
+  // meaning route does not have auth
+  if (!route) {
+    return false;
+  }
+  return true;
+}
+
 export default routes;
