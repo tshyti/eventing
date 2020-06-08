@@ -44,15 +44,7 @@ namespace Domain.Services
 
         public async Task<UserDTO> GetUserById(string id)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user is null)
-            {
-                throw new HttpResponseException
-                {
-                    Status = 404,
-                    Value = "User not found!"
-                };
-            }
+            var user = await GetApplicationUserById(id);
             return _mapper.Map<ApplicationUser, UserDTO>(user);
         }
         
@@ -79,21 +71,20 @@ namespace Domain.Services
 
         public async Task UpdateUser(string id, UpdateUserDTO updateUserDto)
         {
-            var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (userInDb is null)
-            {
-                throw new HttpResponseException
-                {
-                    Status = 404,
-                    Value = "User not found!"
-                };
-            }
+            var userInDb = await GetApplicationUserById(id);
 
             _mapper.Map(updateUserDto, userInDb);
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteUser(string id)
+        {
+
+            var userInDb = await GetApplicationUserById(id);
+            await _userManager.DeleteAsync(userInDb);
+        }
+
+        public async Task<ApplicationUser> GetApplicationUserById(string id)
         {
             var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
             if (userInDb is null)
@@ -105,7 +96,7 @@ namespace Domain.Services
                 };
             }
 
-            await _userManager.DeleteAsync(userInDb);
+            return userInDb;
         }
     }
 }
