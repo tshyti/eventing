@@ -1,20 +1,42 @@
 import axios from 'utils/axiosConfig';
 import { AxiosResponse } from 'axios';
 import { GetUsersRequest, GetUsersResponse } from './models';
-import { loadingGetUsers, getUsersSuccess } from './usersSlice';
+import { loadingTableState, getUsersSuccess } from './usersSlice';
 
-export default function getAllUsers(userRequest: GetUsersRequest) {
+// TODO: add error handling in axios interceptor
+export function getAllUsers(userRequest: GetUsersRequest) {
   return async (dispatch) => {
-    dispatch(loadingGetUsers(true));
+    dispatch(loadingTableState(true));
     try {
-      const res: AxiosResponse<GetUsersResponse> = await axios.get('users', {
-        params: userRequest,
-      });
-      dispatch(getUsersSuccess(res.data));
-    } catch (error) {
-      console.log(error);
+      const users = await getUsersFromApi(userRequest);
+      dispatch(getUsersSuccess(users));
     } finally {
-      dispatch(loadingGetUsers(false));
+      dispatch(loadingTableState(false));
+    }
+  };
+}
+
+async function getUsersFromApi(userRequest: GetUsersRequest) {
+  const res: AxiosResponse<GetUsersResponse> = await axios.get('users', {
+    params: userRequest,
+  });
+  return res.data;
+}
+
+export function deleteUser(
+  userId: string,
+  pageNumber: number,
+  pageSize: number
+) {
+  return async (dispatch) => {
+    dispatch(loadingTableState(true));
+    try {
+      await axios.delete(`users/${userId}`);
+      const users = await getUsersFromApi({ pageNumber, pageSize });
+      console.log(users);
+      dispatch(getUsersSuccess(users));
+    } finally {
+      dispatch(loadingTableState(false));
     }
   };
 }

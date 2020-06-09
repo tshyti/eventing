@@ -11,7 +11,7 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    loadingGetUsers(state, action: PayloadAction<boolean>) {
+    loadingTableState(state, action: PayloadAction<boolean>) {
       return { ...state, loading: action.payload };
     },
     getUsersSuccess(state, action: PayloadAction<GetUsersResponse>) {
@@ -20,6 +20,6 @@ const usersSlice = createSlice({
   },
 });
 
-export const { loadingGetUsers, getUsersSuccess } = usersSlice.actions;
+export const { loadingTableState, getUsersSuccess } = usersSlice.actions;
 
 export default usersSlice.reducer;
