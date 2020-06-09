@@ -10,6 +10,7 @@ import { Spin } from 'antd';
 import { loginUserSuccess } from 'slices/auth/authSlice';
 import useDidUpdate from 'hooks/didUpdateEffect';
 import axios from 'utils/axiosConfig';
+import FullPageLoading from 'components/FullPageLoading';
 
 function MyApp({ Component, pageProps }) {
   const { pathname, events } = useRouter();
@@ -77,18 +78,7 @@ function MyApp({ Component, pageProps }) {
   }
 
   if (appLoading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          minHeight: '100vh',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Spin indicator={<LoadingOutlined style={{ fontSize: 50 }} spin />} />
-      </div>
-    );
+    return <FullPageLoading />;
   }
   return <Component {...pageProps} />;
 }

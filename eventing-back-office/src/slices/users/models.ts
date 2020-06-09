@@ -1,18 +1,15 @@
 export interface UsersSliceState {
-  userResponse?: UserResponse;
+  userResponse?: GetUsersResponse;
   loading: boolean;
+  error?: any;
 }
 
-export interface User {
-  id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  organizationName?: string;
-  createdOn: Date;
+export interface GetUsersRequest {
+  pageNumber: number;
+  pageSize: number;
 }
 
-export interface UserResponse {
+export interface GetUsersResponse {
   firstIndex: number;
   lastIndex: number;
   maxItems: number;
@@ -20,4 +17,12 @@ export interface UserResponse {
   result: User[];
   pageNumber: number;
   pageSize: number;
+}
+export interface User {
+  id: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  organizationName?: string;
+  createdOn: Date;
 }

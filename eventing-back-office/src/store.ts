@@ -5,14 +5,15 @@ import {
   ThunkAction,
   Action,
   AnyAction,
-  createStore,
 } from '@reduxjs/toolkit';
 import { createWrapper, Context, HYDRATE } from 'next-redux-wrapper';
 import authReducer from 'slices/auth/authSlice';
 import globalReducer from 'slices/global/globalSlice';
+import usersReducer from 'slices/users/usersSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  users: usersReducer,
   global: globalReducer,
 });
 
