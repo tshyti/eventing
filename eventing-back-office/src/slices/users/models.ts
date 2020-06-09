@@ -1,7 +1,18 @@
 export interface UsersSliceState {
   userResponse?: GetUsersResponse;
   loading: boolean;
+  loadingUpdateUser: boolean;
   error?: any;
+}
+
+export interface UpdateUserRequest {
+  firstname: string;
+  lastname: string;
+  organizationName: string;
+}
+
+export interface UpdateUserSuccessObject extends UpdateUserRequest {
+  userRowIndex: number;
 }
 
 export interface GetUsersRequest {
@@ -18,6 +29,7 @@ export interface GetUsersResponse {
   pageNumber: number;
   pageSize: number;
 }
+
 export interface User {
   id: string;
   firstname: string;

@@ -2,12 +2,14 @@
 import MainLayout from 'Layouts/MainLayout/MainLayout';
 import { Table, Breadcrumb, Popconfirm, Modal, Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { User } from 'slices/users/models';
+import { User, UpdateUserRequest } from 'slices/users/models';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { getAllUsers, deleteUser } from 'slices/users/thunks';
+import { getAllUsers, deleteUser, updateUser } from 'slices/users/thunks';
 import { RootState } from 'store';
 import { createSelector } from 'reselect';
+import UserForm from 'components/UserForm';
+import { useForm } from 'antd/lib/form/util';
 
 const usersSelector = createSelector<RootState, User[], User[]>(
   (state) => state.users.userResponse?.result,
@@ -40,7 +42,7 @@ export default function Users() {
     {
       title: 'Actions',
       dataIndex: 'id',
-      render: (id: string, record) => (
+      render: (id: string, record, rowIndex) => (
         <>
           <Popconfirm
             title="Are you sure?"
@@ -51,7 +53,7 @@ export default function Users() {
             <a>Delete</a>
           </Popconfirm>
           <a
-            onClick={() => onEditClick(record)}
+            onClick={() => onEditClick(record, rowIndex)}
             role="button"
             tabIndex={0}
             style={{ marginLeft: '12px' }}
@@ -66,15 +68,20 @@ export default function Users() {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [editUsersModalVisible, setEditUsersModalVisible] = useState(false);
-  const [selectedUserToEdit, setSelectedUserToEdit] = useState<User>(null);
+  const [selectedUserRowIndex, setSelectedUserRowIndex] = useState(0);
+
   const loadingUsers = useSelector<RootState, boolean>(
     (state) => state.users.loading
   );
   const total = useSelector<RootState, number>(
     (state) => state.users.userResponse?.maxItems
   );
+  const loadingUpdateUser = useSelector<RootState, boolean>(
+    (state) => state.users.loadingUpdateUser
+  );
   const users = useSelector(usersSelector);
 
+  const [form] = useForm();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -97,9 +104,37 @@ export default function Users() {
     dispatch(deleteUser(userId, pageNumber - 1, pageSize));
   }
 
-  function onEditClick(user: User) {
+  function onEditClick(user: User, userRowIndex: number) {
+    form.setFields([
+      { name: 'firstname', value: user.firstname },
+      { name: 'lastname', value: user.lastname },
+      { name: 'email', value: user.email },
+      { name: 'organizationName', value: user.organizationName },
+    ]);
     setEditUsersModalVisible(true);
-    setSelectedUserToEdit(user);
+    setSelectedUserRowIndex(userRowIndex);
+  }
+
+  function onEditSubmit() {
+    // const {
+    //   firstname,
+    //   lastname,
+    //   organizationName,
+    // } = selectedUserToEdit as UpdateUserRequest;
+
+    const userRequest: UpdateUserRequest = {
+      firstname: 'lest',
+      lastname: 'lest',
+      organizationName: 'least',
+    };
+
+    dispatch(
+      updateUser(
+        users[selectedUserRowIndex].id,
+        userRequest,
+        selectedUserRowIndex
+      )
+    );
   }
 
   function onPageChange(pNumber: number, pSize: number) {
@@ -138,25 +173,22 @@ export default function Users() {
       <Modal
         visible={editUsersModalVisible}
         title="Edit User"
-        // onOk={this.handleOk}
         onCancel={() => setEditUsersModalVisible(false)}
         footer={[
-          <Button key="back">Cancel</Button>,
+          <Button key="back" onClick={() => setEditUsersModalVisible(false)}>
+            Cancel
+          </Button>,
           <Button
             key="submit"
             type="primary"
-            // loading={loading}
-            // onClick={this.handleOk}
+            loading={loadingUpdateUser}
+            onClick={onEditSubmit}
           >
             Submit
           </Button>,
         ]}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <UserForm form={form} isEdit />
       </Modal>
     </MainLayout>
   );
