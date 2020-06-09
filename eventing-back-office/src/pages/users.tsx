@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import MainLayout from 'Layouts/MainLayout/MainLayout';
-import { Table, Space, Breadcrumb, Popconfirm } from 'antd';
+import { Table, Breadcrumb, Popconfirm, Modal, Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { User } from 'slices/users/models';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,7 +40,7 @@ export default function Users() {
     {
       title: 'Actions',
       dataIndex: 'id',
-      render: (id: string) => (
+      render: (id: string, record) => (
         <>
           <Popconfirm
             title="Are you sure?"
@@ -50,7 +50,14 @@ export default function Users() {
           >
             <a>Delete</a>
           </Popconfirm>
-          <a style={{ marginLeft: '12px' }}>Update</a>
+          <a
+            onClick={() => onEditClick(record)}
+            role="button"
+            tabIndex={0}
+            style={{ marginLeft: '12px' }}
+          >
+            Edit
+          </a>
         </>
       ),
     },
@@ -58,6 +65,8 @@ export default function Users() {
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [editUsersModalVisible, setEditUsersModalVisible] = useState(false);
+  const [selectedUserToEdit, setSelectedUserToEdit] = useState<User>(null);
   const loadingUsers = useSelector<RootState, boolean>(
     (state) => state.users.loading
   );
@@ -81,11 +90,16 @@ export default function Users() {
   }
 
   function onUserDelete(userId: string) {
-    // check if user is last in page
+    // check if user is last remaining in page
     if (total - 1 === pageSize) {
       setPageNumber(pageNumber - 1);
     }
     dispatch(deleteUser(userId, pageNumber - 1, pageSize));
+  }
+
+  function onEditClick(user: User) {
+    setEditUsersModalVisible(true);
+    setSelectedUserToEdit(user);
   }
 
   function onPageChange(pNumber: number, pSize: number) {
@@ -121,6 +135,29 @@ export default function Users() {
         columns={columns}
         dataSource={users}
       />
+      <Modal
+        visible={editUsersModalVisible}
+        title="Edit User"
+        // onOk={this.handleOk}
+        onCancel={() => setEditUsersModalVisible(false)}
+        footer={[
+          <Button key="back">Cancel</Button>,
+          <Button
+            key="submit"
+            type="primary"
+            // loading={loading}
+            // onClick={this.handleOk}
+          >
+            Submit
+          </Button>,
+        ]}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </MainLayout>
   );
 }

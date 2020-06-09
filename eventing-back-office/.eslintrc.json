@@ -41,7 +41,8 @@
     "no-useless-escape": "off",
     "camelcase": "off",
     "no-use-before-define": "off",
-    "consistent-return": "warn"
+    "consistent-return": "warn",
+    "jsx-a11y/click-events-have-key-events": "off"
   },
   "settings": {
     "import/resolver": {

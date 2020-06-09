@@ -1,5 +1,6 @@
 import axios from 'utils/axiosConfig';
 import { AxiosResponse } from 'axios';
+import { message } from 'antd';
 import { GetUsersRequest, GetUsersResponse } from './models';
 import { loadingTableState, getUsersSuccess } from './usersSlice';
 
@@ -33,7 +34,7 @@ export function deleteUser(
     try {
       await axios.delete(`users/${userId}`);
       const users = await getUsersFromApi({ pageNumber, pageSize });
-      console.log(users);
+      message.success('Deleted Successfully');
       dispatch(getUsersSuccess(users));
     } finally {
       dispatch(loadingTableState(false));
