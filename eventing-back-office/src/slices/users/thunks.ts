@@ -66,6 +66,7 @@ export function updateUser(
         userRowIndex: userRowId,
       };
       dispatch(updateUserSuccess(updateUserObj));
+      message.success(`User updated successfully`);
     } finally {
       dispatch(loadingUpdateUser(false));
     }

@@ -37,8 +37,11 @@ namespace Domain.Services
 
         public async Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request)
         {
-            var users = await _dbContext.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .ProjectTo<UserDTO>(_mapper.ConfigurationProvider).GetPaged<UserDTO>(request);
+            var users = await _dbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
+                .GetPaged<UserDTO>(request);
             return users;
         }
 

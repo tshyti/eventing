@@ -13,6 +13,22 @@ export default function UserForm(props: UserFormProps) {
   return (
     <Form form={form} layout="vertical" name="form_in_modal">
       <Row gutter={[16, 8]}>
+        <Col span={24}>
+          <Form.Item
+            name="email"
+            label="E-mail"
+            rules={
+              !isEdit && [
+                {
+                  required: true,
+                  message: 'Please input the title of collection!',
+                },
+              ]
+            }
+          >
+            <Input readOnly={isEdit} />
+          </Form.Item>
+        </Col>
         <Col span={12}>
           <Form.Item
             name="firstname"
@@ -51,22 +67,6 @@ export default function UserForm(props: UserFormProps) {
         </Col>
         <Col span={12}>
           <Form.Item
-            name="email"
-            label="E-mail"
-            rules={
-              !isEdit && [
-                {
-                  required: true,
-                  message: 'Please input the title of collection!',
-                },
-              ]
-            }
-          >
-            <Input readOnly={isEdit} />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
             name="organizationName"
             label="Organization"
             rules={[
@@ -77,6 +77,22 @@ export default function UserForm(props: UserFormProps) {
             ]}
           >
             <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="role"
+            label="Role"
+            rules={
+              !isEdit && [
+                {
+                  min: 2,
+                  message: 'Minimun 2 characters',
+                },
+              ]
+            }
+          >
+            <Input readOnly={isEdit} />
           </Form.Item>
         </Col>
       </Row>

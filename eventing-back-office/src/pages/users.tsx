@@ -35,6 +35,10 @@ export default function Users() {
       dataIndex: 'email',
     },
     {
+      title: 'Role',
+      dataIndex: 'role',
+    },
+    {
       title: 'Organization Name',
       dataIndex: 'organizationName',
     },
@@ -121,6 +125,7 @@ export default function Users() {
       { name: 'firstname', value: user.firstname, touched: false },
       { name: 'lastname', value: user.lastname, touched: false },
       { name: 'email', value: user.email, touched: false },
+      { name: 'role', value: user.role, touched: false },
       {
         name: 'organizationName',
         value: user.organizationName,
@@ -130,6 +135,10 @@ export default function Users() {
   }
 
   async function onEditSubmit() {
+    if (!form.isFieldsTouched()) {
+      dispatch(setUserModalVisible(false));
+      return;
+    }
     try {
       const {
         firstname,
