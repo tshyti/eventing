@@ -18,6 +18,7 @@ namespace Domain.MappingProfiles
             CreateMap<ApplicationUser, UserDTO>()
             .ForMember(dest => dest.Role, o => o.MapFrom(src => src.UserRoles[0].Role.Name));
             CreateMap<UpdateUserDTO, ApplicationUser>();
+            CreateMap<ApplicationRole, RoleDTO>();
         }
     }
 }

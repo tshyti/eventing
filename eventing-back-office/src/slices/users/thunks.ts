@@ -4,14 +4,17 @@ import { message } from 'antd';
 import {
   GetUsersRequest,
   GetUsersResponse,
+  CreateUserRequest,
   UpdateUserRequest,
   UpdateUserSuccessObject,
+  User,
 } from './models';
 import {
   loadingTableState,
-  loadingUpdateUser,
+  loadingSubmitForm,
   getUsersSuccess,
   updateUserSuccess,
+  createUserSuccess,
 } from './usersSlice';
 
 // TODO: add error handling in axios interceptor
@@ -44,7 +47,7 @@ export function deleteUser(
     try {
       await axios.delete(`users/${userId}`);
       const users = await getUsersFromApi({ pageNumber, pageSize });
-      message.success('Deleted Successfully');
+      message.success('User Deleted Successfully');
       dispatch(getUsersSuccess(users));
     } finally {
       dispatch(loadingTableState(false));
@@ -58,7 +61,7 @@ export function updateUser(
   userRowId: number
 ) {
   return async (dispatch) => {
-    dispatch(loadingUpdateUser(true));
+    dispatch(loadingSubmitForm(true));
     try {
       await axios.put(`users/${userId}`, user);
       const updateUserObj: UpdateUserSuccessObject = {
@@ -68,7 +71,22 @@ export function updateUser(
       dispatch(updateUserSuccess(updateUserObj));
       message.success(`User updated successfully`);
     } finally {
-      dispatch(loadingUpdateUser(false));
+      dispatch(loadingSubmitForm(false));
+    }
+  };
+}
+
+export function createUser(createUserRequest: CreateUserRequest) {
+  return async (dispatch) => {
+    dispatch(loadingSubmitForm(true));
+    try {
+      const res: AxiosResponse<User> = await axios.put(
+        'users',
+        createUserRequest
+      );
+      dispatch(createUserSuccess(res.data));
+    } finally {
+      dispatch(loadingSubmitForm(false));
     }
   };
 }

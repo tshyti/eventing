@@ -1,9 +1,9 @@
 export interface UsersSliceState {
   userResponse?: GetUsersResponse;
   loading: boolean;
-  loadingUpdateUser: boolean;
+  loadingSubmitForm: boolean;
+  haveAddedUser: boolean;
   userModalVisible: boolean;
-  error?: any;
 }
 
 export interface UpdateUserRequest {
@@ -14,6 +14,14 @@ export interface UpdateUserRequest {
 
 export interface UpdateUserSuccessObject extends UpdateUserRequest {
   userRowIndex: number;
+}
+
+export interface CreateUserRequest {
+  roleId: string;
+  organizationName: string;
+  firstname: string;
+  lastname: string;
+  email: string;
 }
 
 export interface GetUsersRequest {

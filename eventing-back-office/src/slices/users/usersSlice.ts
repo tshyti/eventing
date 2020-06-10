@@ -3,14 +3,15 @@ import {
   UsersSliceState,
   GetUsersResponse,
   UpdateUserSuccessObject,
+  User,
 } from './models';
 
 const initialState: UsersSliceState = {
   userResponse: null,
   loading: false,
-  loadingUpdateUser: false,
+  loadingSubmitForm: false,
   userModalVisible: false,
-  error: null,
+  haveAddedUser: false,
 };
 
 const usersSlice = createSlice({
@@ -20,14 +21,28 @@ const usersSlice = createSlice({
     loadingTableState(state, action: PayloadAction<boolean>) {
       return { ...state, loading: action.payload };
     },
-    loadingUpdateUser(state, action: PayloadAction<boolean>) {
-      return { ...state, loadingUpdateUser: action.payload };
+    loadingSubmitForm(state, action: PayloadAction<boolean>) {
+      return { ...state, loadingSubmitForm: action.payload };
     },
     setUserModalVisible(state, action: PayloadAction<boolean>) {
       return { ...state, userModalVisible: action.payload };
     },
     getUsersSuccess(state, action: PayloadAction<GetUsersResponse>) {
       return { ...state, userResponse: action.payload };
+    },
+    createUserSuccess(state, action: PayloadAction<User>) {
+      const userResult = [...state.userResponse.result];
+      userResult.slice(userResult.length - 2, 1);
+      userResult.unshift(action.payload);
+      return {
+        ...state,
+        haveAddedUser: true,
+        userResponse: {
+          ...state.userResponse,
+          maxItems: state.userResponse.maxItems + 1,
+          result: userResult,
+        },
+      };
     },
     updateUserSuccess(state, action: PayloadAction<UpdateUserSuccessObject>) {
       const {
@@ -56,10 +71,11 @@ const usersSlice = createSlice({
 
 export const {
   loadingTableState,
-  loadingUpdateUser,
+  loadingSubmitForm,
   setUserModalVisible,
   getUsersSuccess,
   updateUserSuccess,
+  createUserSuccess,
 } = usersSlice.actions;
 
 export default usersSlice.reducer;

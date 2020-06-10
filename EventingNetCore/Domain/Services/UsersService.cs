@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.DTOs;
 using Domain.IServices;
@@ -106,6 +108,15 @@ namespace Domain.Services
             }
 
             return userInDb;
+        }
+
+        public async Task<IList<RoleDTO>> GetAvailableUserRoles()
+        {
+            var userRoles = await _dbContext.Roles
+                .Where(r => r.Name != UserRoleNames.Common)
+                .ProjectTo<RoleDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+            return userRoles;
         }
     }
 }

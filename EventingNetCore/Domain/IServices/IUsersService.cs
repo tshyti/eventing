@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.RequestModels;
 using Domain.DTOs;
@@ -15,5 +17,6 @@ namespace Domain.IServices
         Task UpdateUser(string userId, UpdateUserDTO updateUserDto);
         Task DeleteUser(string id);
         Task<ApplicationUser> GetApplicationUserById(string id);
+        Task<IList<RoleDTO>> GetAvailableUserRoles();
     }
 }

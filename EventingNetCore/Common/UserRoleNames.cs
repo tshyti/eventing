@@ -4,6 +4,6 @@ namespace Common
     {
         public const string Common = "Common";
         public const string Admin = "Admin";
-        public const string EventCreator = "EventCreator";
+        public const string EventCreator = "Event Creator";
     }
 }

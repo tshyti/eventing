@@ -1,9 +1,19 @@
 /* eslint-disable react/display-name */
+import 'styles/users.less';
 import MainLayout from 'Layouts/MainLayout/MainLayout';
-import { Table, Breadcrumb, Popconfirm, Modal, Button } from 'antd';
+import { Table, Popconfirm, Modal, Button, PageHeader } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { User, UpdateUserRequest } from 'slices/users/models';
-import { getAllUsers, deleteUser, updateUser } from 'slices/users/thunks';
+import {
+  User,
+  UpdateUserRequest,
+  CreateUserRequest,
+} from 'slices/users/models';
+import {
+  getAllUsers,
+  deleteUser,
+  updateUser,
+  createUser,
+} from 'slices/users/thunks';
 import { setUserModalVisible } from 'slices/users/usersSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
@@ -76,15 +86,19 @@ export default function Users() {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedUserRowIndex, setSelectedUserRowIndex] = useState(0);
+  const [isEditForm, setIsEditForm] = useState(false);
 
   const loadingUsers = useSelector<RootState, boolean>(
     (state) => state.users.loading
   );
-  const loadingUpdateUser = useSelector<RootState, boolean>(
-    (state) => state.users.loadingUpdateUser
+  const loadingSubmitForm = useSelector<RootState, boolean>(
+    (state) => state.users.loadingSubmitForm
   );
   const userModalVisible = useSelector<RootState, boolean>(
     (state) => state.users.userModalVisible
+  );
+  const haveAddedUser = useSelector<RootState, boolean>(
+    (state) => state.users.haveAddedUser
   );
   const total = useSelector<RootState, number>(
     (state) => state.users.userResponse?.maxItems
@@ -109,12 +123,13 @@ export default function Users() {
   function onUserDelete(userId: string) {
     // check if user is last remaining in page
     if (total - 1 === pageSize) {
-      setPageNumber(pageNumber - 1);
+      setPageNumber(pageNumber === 1 ? pageNumber : pageNumber - 1);
     }
     dispatch(deleteUser(userId, pageNumber - 1, pageSize));
   }
 
   function onEditClick(user: User, userRowIndex: number) {
+    setIsEditForm(true);
     setDefaultFormFields(user);
     dispatch(setUserModalVisible(true));
     setSelectedUserRowIndex(userRowIndex);
@@ -161,6 +176,34 @@ export default function Users() {
     } catch (err) {}
   }
 
+  function onCreateClick() {
+    form.resetFields();
+    setIsEditForm(false);
+    dispatch(setUserModalVisible(true));
+  }
+
+  async function onCreateSubmit() {
+    try {
+      const {
+        firstname,
+        lastname,
+        organizationName,
+        roleId,
+        email,
+      } = await form.validateFields();
+
+      const createUserRequest: CreateUserRequest = {
+        firstname,
+        lastname,
+        organizationName,
+        roleId,
+        email,
+      };
+
+      dispatch(createUser(createUserRequest));
+    } catch (err) {}
+  }
+
   function onFormClose() {
     if (!form.isFieldsTouched()) {
       dispatch(setUserModalVisible(false));
@@ -190,10 +233,19 @@ export default function Users() {
 
   return (
     <MainLayout>
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Users</Breadcrumb.Item>
-      </Breadcrumb>
+      <PageHeader
+        style={{
+          backgroundColor: '#ffffff',
+          margin: '24px 0px',
+          padding: '10px 24px',
+        }}
+        title="Users"
+        extra={[
+          <Button key="1" type="primary" onClick={onCreateClick}>
+            Create User
+          </Button>,
+        ]}
+      />
       <Table
         rowKey={(record) => record.id}
         pagination={{
@@ -209,10 +261,13 @@ export default function Users() {
         loading={loadingUsers}
         columns={columns}
         dataSource={users}
+        rowClassName={(record, index) =>
+          index === 0 && haveAddedUser && 'added-user'
+        }
       />
       <Modal
         visible={userModalVisible}
-        title="Edit User"
+        title={`${isEditForm ? 'Edit' : 'Create'} User`}
         onCancel={onFormClose}
         footer={[
           <Button key="back" onClick={onFormClose}>
@@ -221,14 +276,14 @@ export default function Users() {
           <Button
             key="submit"
             type="primary"
-            loading={loadingUpdateUser}
-            onClick={onEditSubmit}
+            loading={loadingSubmitForm}
+            onClick={isEditForm ? onEditSubmit : onCreateSubmit}
           >
             Submit
           </Button>,
         ]}
       >
-        <UserForm form={form} isEdit />
+        <UserForm form={form} isEdit={isEditForm} />
       </Modal>
     </MainLayout>
   );

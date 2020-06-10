@@ -51,5 +51,12 @@ namespace API.Controllers
             var user = await _usersService.CreateUser(createUserDto);
             return Ok(user);
         }
+
+        [HttpGet("getroles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var userRoles = await _usersService.GetAvailableUserRoles();
+            return Ok(userRoles);
+        }
     }
 }
