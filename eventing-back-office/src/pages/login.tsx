@@ -1,11 +1,12 @@
 import { Form, Input, Button, Row, Col, Avatar } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { UserRequest, UserRequestFailed } from 'slices/auth/models';
+import { UserRequest } from 'slices/auth/models';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from 'slices/auth/thunks';
 import { useForm } from 'antd/lib/form/util';
 import { RootState } from 'store';
 import { useEffect } from 'react';
+import ValidationFormError from 'utils/models/ValidationFormError';
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -13,7 +14,7 @@ export default function Login() {
   const loadingLogin = useSelector<RootState, boolean>(
     (state) => state.auth.loadingLogin
   );
-  const errors = useSelector<RootState, UserRequestFailed>(
+  const errors = useSelector<RootState, ValidationFormError>(
     (state) => state.auth.userRequestFailed
   );
 
