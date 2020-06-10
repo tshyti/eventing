@@ -47,11 +47,11 @@ namespace Domain.Services
             var user = await GetApplicationUserById(id);
             return _mapper.Map<ApplicationUser, UserDTO>(user);
         }
-        
+
         public async Task<UserDTO> CreateUser(CreateUserDTO createUserDto)
         {
             var roleInDb = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Id == createUserDto.RoleId);
-            
+
             if (roleInDb is null)
             {
                 throw new HttpResponseException
@@ -63,7 +63,7 @@ namespace Domain.Services
 
             var userToSave = _mapper.Map<ApplicationUser>(createUserDto);
             await _authService.RegisterApplicationUser(userToSave, createUserDto.Password, roleInDb.Name);
-            
+
             var createdUser = await _dbContext.Users.ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
             return createdUser;
