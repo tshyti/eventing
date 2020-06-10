@@ -42,7 +42,8 @@
     "camelcase": "off",
     "no-use-before-define": "off",
     "consistent-return": "warn",
-    "jsx-a11y/click-events-have-key-events": "off"
+    "jsx-a11y/click-events-have-key-events": "off",
+    "no-empty": "warn"
   },
   "settings": {
     "import/resolver": {

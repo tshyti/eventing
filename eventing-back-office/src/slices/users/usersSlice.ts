@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   UsersSliceState,
   GetUsersResponse,
-  UpdateUserRequest,
   UpdateUserSuccessObject,
 } from './models';
 
@@ -10,6 +9,7 @@ const initialState: UsersSliceState = {
   userResponse: null,
   loading: false,
   loadingUpdateUser: false,
+  userModalVisible: false,
   error: null,
 };
 
@@ -22,6 +22,9 @@ const usersSlice = createSlice({
     },
     loadingUpdateUser(state, action: PayloadAction<boolean>) {
       return { ...state, loadingUpdateUser: action.payload };
+    },
+    setUserModalVisible(state, action: PayloadAction<boolean>) {
+      return { ...state, userModalVisible: action.payload };
     },
     getUsersSuccess(state, action: PayloadAction<GetUsersResponse>) {
       return { ...state, userResponse: action.payload };
@@ -45,6 +48,7 @@ const usersSlice = createSlice({
       return {
         ...state,
         userResponse: { ...state.userResponse, result: userResult },
+        userModalVisible: false,
       };
     },
   },
@@ -53,6 +57,7 @@ const usersSlice = createSlice({
 export const {
   loadingTableState,
   loadingUpdateUser,
+  setUserModalVisible,
   getUsersSuccess,
   updateUserSuccess,
 } = usersSlice.actions;

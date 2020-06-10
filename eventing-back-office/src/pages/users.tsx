@@ -3,13 +3,17 @@ import MainLayout from 'Layouts/MainLayout/MainLayout';
 import { Table, Breadcrumb, Popconfirm, Modal, Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { User, UpdateUserRequest } from 'slices/users/models';
+import { getAllUsers, deleteUser, updateUser } from 'slices/users/thunks';
+import { setUserModalVisible } from 'slices/users/usersSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { getAllUsers, deleteUser, updateUser } from 'slices/users/thunks';
 import { RootState } from 'store';
 import { createSelector } from 'reselect';
 import UserForm from 'components/UserForm';
 import { useForm } from 'antd/lib/form/util';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { confirm } = Modal;
 
 const usersSelector = createSelector<RootState, User[], User[]>(
   (state) => state.users.userResponse?.result,
@@ -67,17 +71,19 @@ export default function Users() {
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [editUsersModalVisible, setEditUsersModalVisible] = useState(false);
   const [selectedUserRowIndex, setSelectedUserRowIndex] = useState(0);
 
   const loadingUsers = useSelector<RootState, boolean>(
     (state) => state.users.loading
   );
-  const total = useSelector<RootState, number>(
-    (state) => state.users.userResponse?.maxItems
-  );
   const loadingUpdateUser = useSelector<RootState, boolean>(
     (state) => state.users.loadingUpdateUser
+  );
+  const userModalVisible = useSelector<RootState, boolean>(
+    (state) => state.users.userModalVisible
+  );
+  const total = useSelector<RootState, number>(
+    (state) => state.users.userResponse?.maxItems
   );
   const users = useSelector(usersSelector);
 
@@ -105,36 +111,61 @@ export default function Users() {
   }
 
   function onEditClick(user: User, userRowIndex: number) {
-    form.setFields([
-      { name: 'firstname', value: user.firstname },
-      { name: 'lastname', value: user.lastname },
-      { name: 'email', value: user.email },
-      { name: 'organizationName', value: user.organizationName },
-    ]);
-    setEditUsersModalVisible(true);
+    setDefaultFormFields(user);
+    dispatch(setUserModalVisible(true));
     setSelectedUserRowIndex(userRowIndex);
   }
 
-  function onEditSubmit() {
-    // const {
-    //   firstname,
-    //   lastname,
-    //   organizationName,
-    // } = selectedUserToEdit as UpdateUserRequest;
+  function setDefaultFormFields(user: User) {
+    form.setFields([
+      { name: 'firstname', value: user.firstname, touched: false },
+      { name: 'lastname', value: user.lastname, touched: false },
+      { name: 'email', value: user.email, touched: false },
+      {
+        name: 'organizationName',
+        value: user.organizationName,
+        touched: false,
+      },
+    ]);
+  }
 
-    const userRequest: UpdateUserRequest = {
-      firstname: 'lest',
-      lastname: 'lest',
-      organizationName: 'least',
-    };
+  async function onEditSubmit() {
+    try {
+      const {
+        firstname,
+        lastname,
+        organizationName,
+      } = await form.validateFields();
+      const userRequest: UpdateUserRequest = {
+        firstname,
+        lastname,
+        organizationName,
+      };
 
-    dispatch(
-      updateUser(
-        users[selectedUserRowIndex].id,
-        userRequest,
-        selectedUserRowIndex
-      )
-    );
+      dispatch(
+        updateUser(
+          users[selectedUserRowIndex].id,
+          userRequest,
+          selectedUserRowIndex
+        )
+      );
+    } catch (err) {}
+  }
+
+  function onFormClose() {
+    if (!form.isFieldsTouched()) {
+      dispatch(setUserModalVisible(false));
+    } else {
+      const confirmModal = confirm({
+        icon: <ExclamationCircleOutlined />,
+        title: 'You will lose all your changes!',
+        content: <p>Do you want to continue?</p>,
+        onOk: () => {
+          confirmModal.destroy();
+          dispatch(setUserModalVisible(false));
+        },
+      });
+    }
   }
 
   function onPageChange(pNumber: number, pSize: number) {
@@ -171,11 +202,11 @@ export default function Users() {
         dataSource={users}
       />
       <Modal
-        visible={editUsersModalVisible}
+        visible={userModalVisible}
         title="Edit User"
-        onCancel={() => setEditUsersModalVisible(false)}
+        onCancel={onFormClose}
         footer={[
-          <Button key="back" onClick={() => setEditUsersModalVisible(false)}>
+          <Button key="back" onClick={onFormClose}>
             Cancel
           </Button>,
           <Button

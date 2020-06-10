@@ -2,6 +2,7 @@ export interface UsersSliceState {
   userResponse?: GetUsersResponse;
   loading: boolean;
   loadingUpdateUser: boolean;
+  userModalVisible: boolean;
   error?: any;
 }
 

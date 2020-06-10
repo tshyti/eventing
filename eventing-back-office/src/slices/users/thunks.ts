@@ -65,7 +65,6 @@ export function updateUser(
         ...user,
         userRowIndex: userRowId,
       };
-      console.log(updateUserObj);
       dispatch(updateUserSuccess(updateUserObj));
     } finally {
       dispatch(loadingUpdateUser(false));
