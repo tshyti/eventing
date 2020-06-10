@@ -1,7 +1,3 @@
-import withAuth from 'hoc/withAuth';
-
-function Auth() {
+export default function Auth() {
   return <p>asdf</p>;
 }
-
-export default withAuth(Auth);

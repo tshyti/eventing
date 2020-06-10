@@ -11,6 +11,7 @@ using Common.Exceptions;
 using Domain.Entities.Users;
 using Domain.IServices;
 using Domain.RequestModels;
+using Domain.RequestModels.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,32 +24,35 @@ namespace Domain.Services
     {
         private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly EventingContext _dbContext;
         private readonly IMapper _mapper;
         public AuthenticationService(
             IOptions<JwtBearerTokenSettings> jwtTokenOptions,
             UserManager<ApplicationUser> userManager,
-            EventingContext dbContext,
             IMapper mapper)
         {
             _jwtBearerTokenSettings = jwtTokenOptions.Value;
             _userManager = userManager;
-            _dbContext = dbContext;
             _mapper = mapper;
+
         }
 
-        public async Task Register(CreateUserRequest user)
+        public async Task Register(UserRegisterRequest user)
         {
             var applicationUser = _mapper.Map<ApplicationUser>(user);
+            await RegisterApplicationUser(applicationUser, user.Password);
+        }
 
-            var createdUser = await _userManager.CreateAsync(applicationUser, user.Password);
+        public async Task RegisterApplicationUser(ApplicationUser applicationUser,
+            string password, string roleName = UserRoleNames.Common)
+        {
+            var createdUser = await _userManager.CreateAsync(applicationUser, password);
             if (createdUser.Succeeded)
             {
-                await _userManager.AddToRoleAsync(applicationUser, UserRoleNames.Common);
+                await _userManager.AddToRoleAsync(applicationUser, roleName);
             }
             if (!createdUser.Succeeded)
             {
-                throw new HttpResponseException { Status = 400, Value = createdUser.Errors };
+                throw new HttpResponseException { Status = 409, Value = createdUser.Errors };
             }
         }
 

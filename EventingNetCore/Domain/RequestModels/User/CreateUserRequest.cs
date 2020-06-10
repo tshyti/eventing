@@ -1,10 +1,9 @@
-using System;
 using System.Text.RegularExpressions;
 using FluentValidation;
 
-namespace Domain.RequestModels
+namespace Domain.RequestModels.User
 {
-    public class CreateUserRequest
+    public class UserRegisterRequest
     {
         public string Firstname { get; set; }
         public string Lastname { get; set; }
@@ -12,9 +11,9 @@ namespace Domain.RequestModels
         public string Password { get; set; }
     }
 
-    public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
+    public class UserRegisterRequestValidator : AbstractValidator<UserRegisterRequest>
     {
-        public CreateUserRequestValidator()
+        public UserRegisterRequestValidator()
         {
             RuleFor(m => m.Firstname).NotEmpty().NotNull().MinimumLength(2);
             RuleFor(m => m.Lastname).NotEmpty().NotNull().MinimumLength(2);

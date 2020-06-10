@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SliceState, User, UserRequestFailed } from './models';
+import ValidationFormError from 'utils/models/ValidationFormError';
+import { SliceState, UserAuthDetails } from './models';
 
 const initialState: SliceState = {
   user: {
@@ -19,10 +20,10 @@ const authSlice = createSlice({
     loadingLogin(state, action: PayloadAction<boolean>) {
       return { ...state, loadingLogin: action.payload };
     },
-    loginUserSuccess(state, action: PayloadAction<User>) {
+    loginUserSuccess(state, action: PayloadAction<UserAuthDetails>) {
       return { ...state, user: action.payload, userRequestFailed: null };
     },
-    loginUserFail(state, action: PayloadAction<UserRequestFailed>) {
+    loginUserFail(state, action: PayloadAction<ValidationFormError>) {
       return { ...state, userRequestFailed: action.payload };
     },
   },

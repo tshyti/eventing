@@ -40,7 +40,14 @@
     "import/prefer-default-export": "off",
     "no-useless-escape": "off",
     "camelcase": "off",
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "consistent-return": "warn",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "no-empty": "warn",
+    "no-var": "off",
+    "vars-on-top": "off",
+    "block-scoped-var": "off",
+    "eqeqeq": "warn"
   },
   "settings": {
     "import/resolver": {
