@@ -5,6 +5,6 @@ namespace Domain.Entities.Users
 {
     public class ApplicationRole : IdentityRole
     {
-        public ICollection<ApplicationUserRole> UserRoles { get; set; }
+        public IEnumerable<ApplicationUserRole> UserRoles { get; set; }
     }
 }

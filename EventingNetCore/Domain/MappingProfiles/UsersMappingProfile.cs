@@ -7,7 +7,7 @@ using Domain.RequestModels.User;
 
 namespace Domain.MappingProfiles
 {
-    public class UsersMappingProfile: Profile
+    public class UsersMappingProfile : Profile
     {
         public UsersMappingProfile()
         {
@@ -15,7 +15,8 @@ namespace Domain.MappingProfiles
                 .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
             CreateMap<CreateUserDTO, ApplicationUser>()
                 .ForMember(dest => dest.UserName, o => o.MapFrom(src => src.Email));
-            CreateMap<ApplicationUser, UserDTO>();
+            CreateMap<ApplicationUser, UserDTO>()
+            .ForMember(dest => dest.Role, o => o.MapFrom(src => src.UserRoles[0].Role.Name));
             CreateMap<UpdateUserDTO, ApplicationUser>();
         }
     }

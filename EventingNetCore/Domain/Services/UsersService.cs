@@ -37,7 +37,7 @@ namespace Domain.Services
 
         public async Task<PagedResultDTO<UserDTO>> GetAllUsers(PaginationRequest request)
         {
-            var users = await _dbContext.Users
+            var users = await _dbContext.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
                 .ProjectTo<UserDTO>(_mapper.ConfigurationProvider).GetPaged<UserDTO>(request);
             return users;
         }
@@ -64,7 +64,10 @@ namespace Domain.Services
             var userToSave = _mapper.Map<ApplicationUser>(createUserDto);
             await _authService.RegisterApplicationUser(userToSave, createUserDto.Password, roleInDb.Name);
 
-            var createdUser = await _dbContext.Users.ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
+            var createdUser = await _dbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
             return createdUser;
         }
@@ -86,7 +89,10 @@ namespace Domain.Services
 
         public async Task<ApplicationUser> GetApplicationUserById(string id)
         {
-            var userInDb = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var userInDb = await _dbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
             if (userInDb is null)
             {
                 throw new HttpResponseException
