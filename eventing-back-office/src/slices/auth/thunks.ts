@@ -18,7 +18,6 @@ export function loginUser(payload: UserRequest): AppThunk {
 
       const user = getUserObject(res.data);
       localStorage.setItem('user', JSON.stringify(user));
-
       dispatch(loginUserSuccess(user));
 
       Router.replace(routeRedirectsFromLogin[RoleNamesEnum[user.role]]);

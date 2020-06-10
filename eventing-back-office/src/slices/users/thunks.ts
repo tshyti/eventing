@@ -1,5 +1,5 @@
 import axios from 'utils/axiosConfig';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosError } from 'axios';
 import { message } from 'antd';
 import {
   GetUsersRequest,
@@ -8,6 +8,7 @@ import {
   UpdateUserRequest,
   UpdateUserSuccessObject,
   User,
+  Role,
 } from './models';
 import {
   loadingTableState,
@@ -15,6 +16,8 @@ import {
   getUsersSuccess,
   updateUserSuccess,
   createUserSuccess,
+  getUserRolesSuccess,
+  createUserError,
 } from './usersSlice';
 
 // TODO: add error handling in axios interceptor
@@ -35,6 +38,16 @@ async function getUsersFromApi(userRequest: GetUsersRequest) {
     params: userRequest,
   });
   return res.data;
+}
+
+export function getUserRoles() {
+  return async (dispatch) => {
+    try {
+      const res: AxiosResponse<Role[]> = await axios.get('users/getroles');
+      dispatch(getUserRolesSuccess(res.data));
+    } finally {
+    }
+  };
 }
 
 export function deleteUser(
@@ -80,11 +93,21 @@ export function createUser(createUserRequest: CreateUserRequest) {
   return async (dispatch) => {
     dispatch(loadingSubmitForm(true));
     try {
-      const res: AxiosResponse<User> = await axios.put(
+      const res: AxiosResponse<User> = await axios.post(
         'users',
         createUserRequest
       );
       dispatch(createUserSuccess(res.data));
+    } catch (err) {
+      const { response } = err as AxiosError;
+      if (response.status == 409) {
+        dispatch(
+          createUserError({
+            field: 'email',
+            error: 'Email is already registered!',
+          })
+        );
+      }
     } finally {
       dispatch(loadingSubmitForm(false));
     }

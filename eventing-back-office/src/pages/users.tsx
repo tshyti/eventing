@@ -13,6 +13,7 @@ import {
   deleteUser,
   updateUser,
   createUser,
+  getUserRoles,
 } from 'slices/users/thunks';
 import { setUserModalVisible } from 'slices/users/usersSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,12 +23,22 @@ import { createSelector } from 'reselect';
 import UserForm from 'components/UserForm';
 import { useForm } from 'antd/lib/form/util';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import ValidationFormError from 'utils/models/ValidationFormError';
 
 const { confirm } = Modal;
 
 const usersSelector = createSelector<RootState, User[], User[]>(
   (state) => state.users.userResponse?.result,
   (users) => users
+);
+
+const createUserErrorSelector = createSelector<
+  RootState,
+  ValidationFormError,
+  ValidationFormError
+>(
+  (state) => state.users.createUserError,
+  (err) => err
 );
 
 export default function Users() {
@@ -104,13 +115,23 @@ export default function Users() {
     (state) => state.users.userResponse?.maxItems
   );
   const users = useSelector(usersSelector);
+  const createUserError = useSelector(createUserErrorSelector);
 
   const [form] = useForm();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getAllUsers({ pageNumber, pageSize }));
+    dispatch(getUserRoles());
   }, []);
+
+  useEffect(() => {
+    if (createUserError) {
+      form.setFields([
+        { name: createUserError.field, errors: [createUserError.error] },
+      ]);
+    }
+  }, [createUserError]);
 
   function showTableTotals(itemsTotal: number, itemsRange: [number, number]) {
     return (
@@ -122,9 +143,10 @@ export default function Users() {
 
   function onUserDelete(userId: string) {
     // check if user is last remaining in page
-    if (total - 1 === pageSize) {
-      setPageNumber(pageNumber === 1 ? pageNumber : pageNumber - 1);
+    if (total - 1 === pageSize * (pageNumber - 1)) {
+      var pageNr = pageNumber === 1 ? pageNumber : pageNumber - 1;
     }
+    setPageNumber(pageNr);
     dispatch(deleteUser(userId, pageNumber - 1, pageSize));
   }
 
@@ -188,7 +210,7 @@ export default function Users() {
         firstname,
         lastname,
         organizationName,
-        roleId,
+        role,
         email,
       } = await form.validateFields();
 
@@ -196,7 +218,7 @@ export default function Users() {
         firstname,
         lastname,
         organizationName,
-        roleId,
+        roleId: role,
         email,
       };
 

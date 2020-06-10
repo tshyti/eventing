@@ -67,7 +67,8 @@ namespace Domain.Services
             }
 
             var userToSave = _mapper.Map<ApplicationUser>(createUserDto);
-            await _authService.RegisterApplicationUser(userToSave, createUserDto.Password, roleInDb.Name);
+            var randomPassword = PasswordGenerator.GenerateRandomPassword();
+            await _authService.RegisterApplicationUser(userToSave, randomPassword, roleInDb.NormalizedName);
 
             var createdUser = await _dbContext.Users
                 .Include(u => u.UserRoles)

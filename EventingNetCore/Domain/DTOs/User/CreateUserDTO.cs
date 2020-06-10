@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Domain.RequestModels.User;
 using FluentValidation;
 
@@ -13,7 +14,9 @@ namespace Domain.DTOs.User
     {
         public CreateUserDTOValidator()
         {
-            Include(new UserRegisterRequestValidator());
+            RuleFor(m => m.Firstname).NotEmpty().NotNull().MinimumLength(2);
+            RuleFor(m => m.Lastname).NotEmpty().NotNull().MinimumLength(2);
+            RuleFor(m => m.Email).NotEmpty().NotNull().EmailAddress();
             RuleFor(m => m.RoleId).NotEmpty().NotNull();
             RuleFor(m => m.OrganizationName).NotEmpty().NotNull();
         }

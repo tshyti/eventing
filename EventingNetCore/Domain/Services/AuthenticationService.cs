@@ -33,7 +33,7 @@ namespace Domain.Services
             _jwtBearerTokenSettings = jwtTokenOptions.Value;
             _userManager = userManager;
             _mapper = mapper;
-            
+
         }
 
         public async Task Register(UserRegisterRequest user)
@@ -42,7 +42,7 @@ namespace Domain.Services
             await RegisterApplicationUser(applicationUser, user.Password);
         }
 
-        public async Task RegisterApplicationUser(ApplicationUser applicationUser, 
+        public async Task RegisterApplicationUser(ApplicationUser applicationUser,
             string password, string roleName = UserRoleNames.Common)
         {
             var createdUser = await _userManager.CreateAsync(applicationUser, password);
@@ -52,7 +52,7 @@ namespace Domain.Services
             }
             if (!createdUser.Succeeded)
             {
-                throw new HttpResponseException { Status = 400, Value = createdUser.Errors };
+                throw new HttpResponseException { Status = 409, Value = createdUser.Errors };
             }
         }
 

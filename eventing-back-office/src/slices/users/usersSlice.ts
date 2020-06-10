@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import ValidationFormError from 'utils/models/ValidationFormError';
 import {
   UsersSliceState,
   GetUsersResponse,
   UpdateUserSuccessObject,
   User,
+  Role,
 } from './models';
 
 const initialState: UsersSliceState = {
@@ -28,21 +30,29 @@ const usersSlice = createSlice({
       return { ...state, userModalVisible: action.payload };
     },
     getUsersSuccess(state, action: PayloadAction<GetUsersResponse>) {
-      return { ...state, userResponse: action.payload };
+      return { ...state, userResponse: action.payload, haveAddedUser: false };
+    },
+    getUserRolesSuccess(state, action: PayloadAction<Role[]>) {
+      return { ...state, userRoles: action.payload };
     },
     createUserSuccess(state, action: PayloadAction<User>) {
       const userResult = [...state.userResponse.result];
-      userResult.slice(userResult.length - 2, 1);
+      userResult.pop();
       userResult.unshift(action.payload);
+
       return {
         ...state,
         haveAddedUser: true,
+        userModalVisible: false,
         userResponse: {
           ...state.userResponse,
           maxItems: state.userResponse.maxItems + 1,
           result: userResult,
         },
       };
+    },
+    createUserError(state, action: PayloadAction<ValidationFormError>) {
+      return { ...state, createUserError: action.payload };
     },
     updateUserSuccess(state, action: PayloadAction<UpdateUserSuccessObject>) {
       const {
@@ -74,8 +84,10 @@ export const {
   loadingSubmitForm,
   setUserModalVisible,
   getUsersSuccess,
+  getUserRolesSuccess,
   updateUserSuccess,
   createUserSuccess,
+  createUserError,
 } = usersSlice.actions;
 
 export default usersSlice.reducer;

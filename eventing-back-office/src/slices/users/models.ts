@@ -1,9 +1,18 @@
+import ValidationFormError from 'utils/models/ValidationFormError';
+
 export interface UsersSliceState {
   userResponse?: GetUsersResponse;
+  userRoles?: Role[];
   loading: boolean;
   loadingSubmitForm: boolean;
   haveAddedUser: boolean;
   userModalVisible: boolean;
+  createUserError?: ValidationFormError;
+}
+
+export interface Role {
+  id: string;
+  name: string;
 }
 
 export interface UpdateUserRequest {

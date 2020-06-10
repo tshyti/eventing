@@ -15,14 +15,7 @@ const usersRoute: RouteConfig = {
   allowedRoles: [RoleNamesEnum.Admin],
 };
 
-const testRoute: RouteConfig = {
-  name: 'Test',
-  icon: TeamOutlined,
-  path: '/test',
-  allowedRoles: [RoleNamesEnum.Admin],
-};
-
-const routes: RouteConfig[] = [usersRoute, testRoute];
+const routes: RouteConfig[] = [usersRoute];
 
 export const routeRedirectsFromLogin = {
   [RoleNamesEnum.Admin]: '/users',

@@ -1,6 +1,8 @@
+import ValidationFormError from 'utils/models/ValidationFormError';
+
 export interface SliceState {
   user?: UserAuthDetails;
-  userRequestFailed?: UserRequestFailed;
+  userRequestFailed?: ValidationFormError;
   loadingLogin: boolean;
 }
 
@@ -14,11 +16,6 @@ export interface UserAuthDetails {
 export interface UserRequest {
   email: string;
   password: string;
-}
-
-export interface UserRequestFailed {
-  field: string;
-  error: string;
 }
 
 export interface UserLoginResponse {

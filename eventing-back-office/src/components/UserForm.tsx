@@ -1,6 +1,10 @@
 import React from 'react';
 import { Form, Input, Row, Col, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
+import { createSelector } from 'reselect';
+import { RootState } from 'store';
+import { Role } from 'slices/users/models';
+import { useSelector } from 'react-redux';
 
 const { Option } = Select;
 
@@ -9,8 +13,15 @@ export interface UserFormProps {
   form: FormInstance;
 }
 
+const rolesSelector = createSelector<RootState, Role[], Role[]>(
+  (state) => state.users.userRoles,
+  (userRoles) => userRoles
+);
+
 export default function UserForm(props: UserFormProps) {
   const { isEdit, form } = props;
+
+  const roles = useSelector(rolesSelector);
 
   function RoleInput() {
     if (isEdit) {
@@ -32,12 +43,11 @@ export default function UserForm(props: UserFormProps) {
         ]}
       >
         <Select style={{ width: '100%' }}>
-          <Option value="jack">Jack</Option>
-          <Option value="lucy">Lucy</Option>
-          <Option value="disabled" disabled>
-            Disabled
-          </Option>
-          <Option value="Yiminghe">yiminghe</Option>
+          {roles.map((r) => (
+            <Option key={r.id} value={r.id}>
+              {r.name}
+            </Option>
+          ))}
         </Select>
       </Form.Item>
     );
