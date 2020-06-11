@@ -65,6 +65,10 @@ namespace Domain
             {
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
+                entity.Property(e => e.CreatedBy).IsRequired();
+
+                entity.Property(e => e.CreatedOn).HasDefaultValueSql("now()");
+
                 entity.Property(e => e.Description).HasMaxLength(500);
 
                 entity.Property(e => e.Location)
@@ -76,11 +80,19 @@ namespace Domain
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Price).HasColumnType("money");
+
+                entity.HasOne(d => d.ApplicationUser)
+                    .WithMany(p => p.Events)
+                    .HasForeignKey(x => x.CreatedBy)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("events_created_by_fk");
             });
 
             modelBuilder.Entity<Tags>(entity =>
             {
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.CreatedOn).HasDefaultValueSql("now()");
 
                 entity.Property(e => e.Name)
                     .IsRequired()

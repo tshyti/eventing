@@ -99,8 +99,9 @@ namespace API {
                 };
             });
 
-            services.AddTransient<IAuthenticationService, AuthenticationService> ();
-            services.AddTransient<IUsersService, UsersService> ();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IUsersService, UsersService>();
+            services.AddTransient<IEventsService, EventsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
