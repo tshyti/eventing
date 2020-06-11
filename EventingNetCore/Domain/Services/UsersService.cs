@@ -43,7 +43,7 @@ namespace Domain.Services
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                 .ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
-                .GetPaged<UserDTO>(request);
+                .GetPagedAsync(request);
             return users;
         }
 

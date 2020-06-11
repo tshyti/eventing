@@ -9,7 +9,7 @@ namespace Domain.Helpers
 {
     public static class Pagination
     {
-        public static async Task<PagedResultDTO<T>> GetPaged<T>(this IQueryable<T> query,
+        public static async Task<PagedResultDTO<T>> GetPagedAsync<T>(this IQueryable<T> query,
             PaginationRequest paging) where T: class
         {
             var pagedResult = new PagedResultDTO<T>

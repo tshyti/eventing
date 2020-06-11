@@ -42,20 +42,20 @@ namespace Domain
             });
             modelBuilder.Entity<EventTags>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new {e.Eventid, e.Tagid});
 
                 entity.Property(e => e.Eventid).HasColumnName("eventid");
 
                 entity.Property(e => e.Tagid).HasColumnName("tagid");
 
                 entity.HasOne(d => d.Event)
-                    .WithMany()
+                    .WithMany(e => e.EventTags)
                     .HasForeignKey(x => x.Eventid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("EventTags_eventid_fkey");
 
                 entity.HasOne(d => d.Tag)
-                    .WithMany()
+                    .WithMany(e => e.EventTags)
                     .HasForeignKey(x => x.Tagid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("EventTags_tagid_fkey");

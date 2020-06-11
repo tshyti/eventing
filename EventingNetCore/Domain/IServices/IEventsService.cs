@@ -7,7 +7,7 @@ namespace Domain.IServices
 {
     public interface IEventsService
     {
-        Task<PagedResultDTO<EventDTO>> GetEventsOfUser(PaginationRequest request, string userId);
+        Task<PagedResultDTO<EventDTO>> GetUserEvents(PaginationRequest request, string userId);
         Task<PagedResultDTO<EventDTO>> GetAllEvents(PaginationRequest request);
         Task<EventDTO> GetEventById(int eventId);
         Task<EventDTO> CreateEvent(CreateEventDTO createEventDto, string userId);

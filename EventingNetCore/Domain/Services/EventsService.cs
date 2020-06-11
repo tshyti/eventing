@@ -1,9 +1,14 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain.DTOs;
 using Domain.DTOs.Events;
+using Domain.Entities;
+using Domain.Helpers;
 using Domain.IServices;
 using Domain.RequestModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Services
 {
@@ -20,9 +25,16 @@ namespace Domain.Services
             _mapper = mapper;
         }
 
-        public Task<PagedResultDTO<EventDTO>> GetEventsOfUser(PaginationRequest request, string userId)
+        // TODO: query events by userId
+        public async Task<PagedResultDTO<EventDTO>> GetUserEvents(PaginationRequest request, string userId)
         {
-            throw new System.NotImplementedException();
+            var events = await _dbContext.Events
+                .Include(e => e.ApplicationUser)
+                .Include(e => e.EventTags)
+                .ThenInclude(e => e.Tag)
+                .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
+                .GetPagedAsync(request);
+            return events;
         }
 
         public Task<PagedResultDTO<EventDTO>> GetAllEvents(PaginationRequest request)

@@ -8,5 +8,6 @@ namespace Domain.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public DateTime CreatedOn { get; set; }
+        public virtual ICollection<EventTags> EventTags { get; set; }
     }
 }

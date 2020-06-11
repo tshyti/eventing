@@ -13,7 +13,7 @@ namespace Domain.Entities
         public decimal Price { get; set; }
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
-
         public virtual ApplicationUser ApplicationUser { get; set; }
+        public ICollection<EventTags> EventTags { get; set; }
     }
 }
