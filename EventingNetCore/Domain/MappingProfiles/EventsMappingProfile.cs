@@ -13,6 +13,7 @@ namespace Domain.MappingProfiles
             CreateMap<Events, EventDTO>()
                 .ForMember(d => d.Tags, o => o.MapFrom(src => src.EventTags.Select(x => x.Tag)))
                 .ForMember(d => d.CreatedBy, o => o.MapFrom((src => src.ApplicationUser.OrganizationName)));
+            CreateMap<CreateEventDTO, Events>();
         }
     }
 }

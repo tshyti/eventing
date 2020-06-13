@@ -10,6 +10,7 @@ namespace Domain.MappingProfiles
         public TagsMappingProfile()
         {
             CreateMap<Tags, TagDTO>();
+            CreateMap<int, EventTags>().ConvertUsing(id => new EventTags{Tagid = id});
         }
     }
 }

@@ -98,8 +98,9 @@ namespace Domain.Services
                 {
                     new Claim(ClaimTypes.Name, user.Firstname),
                     new Claim(ClaimTypes.Surname, user.Lastname),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id), 
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, roleName),
+                    new Claim(ClaimTypes.Role, roleName), 
                 }),
                 Expires = DateTime.UtcNow.AddDays(int.Parse(Environment.GetEnvironmentVariable("EXPIRE_TIME_DAYS"))),
                 SigningCredentials = new SigningCredentials

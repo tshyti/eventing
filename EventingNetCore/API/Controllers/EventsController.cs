@@ -1,5 +1,8 @@
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Helpers;
+using Domain.DTOs.Events;
 using Domain.IServices;
 using Domain.RequestModels;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +27,15 @@ namespace API.Controllers
             var events = await _eventsService.
                 GetUserEvents(request, userId);
             return Ok(events);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Event Creator")]
+        public async Task<IActionResult> Post([FromBody] CreateEventDTO createEventDto)
+        {
+            var userId = HttpRequestHelper.GetUserId(HttpContext);
+            var createdEvent = await _eventsService.CreateEvent(createEventDto, userId);
+            return Ok(createdEvent);
         }
     }
 }

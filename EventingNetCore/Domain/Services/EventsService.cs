@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Common.Exceptions;
 using Domain.DTOs;
 using Domain.DTOs.Events;
 using Domain.Entities;
+using Domain.Entities.Users;
 using Domain.Helpers;
 using Domain.IServices;
 using Domain.RequestModels;
@@ -38,19 +41,52 @@ namespace Domain.Services
             return events;
         }
 
-        public Task<PagedResultDTO<EventDTO>> GetAllEvents(PaginationRequest request)
+        public async Task<PagedResultDTO<EventDTO>> GetAllEvents(PaginationRequest request)
         {
-            throw new System.NotImplementedException();
+            var events = await _dbContext.Events
+                .Include(e => e.ApplicationUser)
+                .Include(e => e.EventTags)
+                .ThenInclude(e => e.Tag)
+                .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
+                .GetPagedAsync(request);
+            return events;
         }
 
-        public Task<EventDTO> GetEventById(int eventId)
+        public async Task<EventDTO> GetEventById(int eventId)
         {
-            throw new System.NotImplementedException();
+            var ev = await _dbContext.Events
+                .Include(e => e.ApplicationUser)
+                .Include(e => e.EventTags)
+                .ThenInclude(e => e.Tag)
+                .Where(e => e.Id == eventId)
+                .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+            return ev;
         }
 
-        public Task<EventDTO> CreateEvent(CreateEventDTO createEventDto, string userId)
+        public async Task<EventDTO> CreateEvent(CreateEventDTO createEventDto, string userId)
         {
-            throw new System.NotImplementedException();
+            var eventToCreate = _mapper.Map<Events>(createEventDto);
+            eventToCreate.CreatedBy = userId;
+            try
+            {
+                await _dbContext.Events.AddAsync(eventToCreate);
+
+                var eventTagsToCreate = _mapper.Map<List<EventTags>>(createEventDto.TagIDs);
+                eventTagsToCreate.ForEach(e => e.Event = eventToCreate);
+                await _dbContext.EventTags.AddRangeAsync(eventTagsToCreate);
+
+                await _dbContext.SaveChangesAsync();
+                return await GetEventById(eventToCreate.Id);
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "Some sent data could not be found"
+                };
+            }
         }
 
         public Task UpdateEvent(UpdateEventDTO updateEventDto, string userId)

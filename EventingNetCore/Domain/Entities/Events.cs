@@ -11,7 +11,8 @@ namespace Domain.Entities
         public string Description { get; set; }
         public string Location { get; set; }
         public decimal Price { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime Date { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public string CreatedBy { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
         public ICollection<EventTags> EventTags { get; set; }
