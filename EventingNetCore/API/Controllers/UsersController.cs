@@ -3,12 +3,14 @@ using Domain.DTOs.User;
 using Domain.IServices;
 using Domain.RequestModels;
 using Domain.RequestModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin" )]
     public class UsersController: ControllerBase
     {
         private readonly IUsersService _usersService;

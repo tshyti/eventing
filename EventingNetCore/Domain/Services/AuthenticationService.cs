@@ -22,15 +22,12 @@ namespace Domain.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
         public AuthenticationService(
-            IOptions<JwtBearerTokenSettings> jwtTokenOptions,
             UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
-            _jwtBearerTokenSettings = jwtTokenOptions.Value;
             _userManager = userManager;
             _mapper = mapper;
 
@@ -85,7 +82,7 @@ namespace Domain.Services
                     }
                 };
             }
-
+            
             var userRoles = await _userManager.GetRolesAsync(userInDb);
             return GenerateJwtToken(userInDb, userRoles[0]);
         }
@@ -93,7 +90,7 @@ namespace Domain.Services
         private string GenerateJwtToken(ApplicationUser user, string roleName)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var secret = Encoding.ASCII.GetBytes(_jwtBearerTokenSettings.SecretKey);
+            var secret = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -104,10 +101,10 @@ namespace Domain.Services
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, roleName),
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(_jwtBearerTokenSettings.ExpiryTimeInSeconds),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(Environment.GetEnvironmentVariable("EXPIRE_TIME_DAYS"))),
                 SigningCredentials = new SigningCredentials
                     (new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _jwtBearerTokenSettings.Issuer
+                Issuer = Environment.GetEnvironmentVariable("ISSUER")
             };
 
             var jwtToken = tokenHandler.CreateToken(tokenDescriptor);

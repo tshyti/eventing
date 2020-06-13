@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -24,14 +25,14 @@ namespace Domain.Services
             _dbContext = dbContext;
             _mapper = mapper;
         }
-
-        // TODO: query events by userId
+        
         public async Task<PagedResultDTO<EventDTO>> GetUserEvents(PaginationRequest request, string userId)
         {
             var events = await _dbContext.Events
                 .Include(e => e.ApplicationUser)
                 .Include(e => e.EventTags)
                 .ThenInclude(e => e.Tag)
+                .Where(e => e.ApplicationUser.Id == userId)
                 .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
                 .GetPagedAsync(request);
             return events;

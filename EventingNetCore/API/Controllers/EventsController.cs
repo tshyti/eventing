@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using API.Helpers;
 using Domain.IServices;
 using Domain.RequestModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -17,11 +18,11 @@ namespace API.Controllers
             _eventsService = eventsService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUserEvents([FromQuery]PaginationRequest request)
+        [HttpGet("getusersevents/{userId}")]
+        public async Task<IActionResult> GetUserEvents(string userId, [FromQuery]PaginationRequest request)
         {
             var events = await _eventsService.
-                GetUserEvents(request, HttpRequestHelper.GetUserId(HttpContext));
+                GetUserEvents(request, userId);
             return Ok(events);
         }
     }

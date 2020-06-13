@@ -60,6 +60,35 @@ namespace API {
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen (c => {
                 c.SwaggerDoc ("v1", new OpenApiInfo { Title = "Eventing API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                    }
+                });
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine (AppContext.BaseDirectory, xmlFile);
@@ -77,11 +106,7 @@ namespace API {
                 .AddEntityFrameworkStores<EventingContext> ();
 
             // configure jwt token options
-            var jwtSection = Configuration.GetSection ("JwtBearerTokenSettings");
-            services.Configure<JwtBearerTokenSettings> (jwtSection);
-
-            var jwtBearerTokenSettings = jwtSection.Get<JwtBearerTokenSettings> ();
-            var key = Encoding.ASCII.GetBytes (jwtBearerTokenSettings.SecretKey);
+            var key = Encoding.ASCII.GetBytes (Environment.GetEnvironmentVariable("JWT_SECRET"));
 
             services.AddAuthentication (options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -91,7 +116,8 @@ namespace API {
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters {
                     ValidateIssuer = true,
-                    ValidIssuer = jwtBearerTokenSettings.Issuer,
+                    ValidateAudience = false,
+                    ValidIssuer = Environment.GetEnvironmentVariable("ISSUER"),
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey (key),
                     ValidateLifetime = true,
