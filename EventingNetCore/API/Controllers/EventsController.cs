@@ -37,5 +37,14 @@ namespace API.Controllers
             var createdEvent = await _eventsService.CreateEvent(createEventDto, userId);
             return Ok(createdEvent);
         }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Event Creator")]
+        public async Task<IActionResult> Put(int id, [FromBody] UpdateEventDTO updateEventDto)
+        {
+            var userId = HttpRequestHelper.GetUserId(HttpContext);
+            await _eventsService.UpdateEvent(updateEventDto, id, userId);
+            return Ok();
+        }
     }
 }

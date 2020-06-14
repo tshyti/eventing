@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using Domain.DTOs;
 using Domain.DTOs.Tags;
@@ -11,6 +12,8 @@ namespace Domain.MappingProfiles
         {
             CreateMap<Tags, TagDTO>();
             CreateMap<int, EventTags>().ConvertUsing(id => new EventTags{Tagid = id});
+            CreateMap<EventTags, TagDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(src => src.Tagid));
         }
     }
 }

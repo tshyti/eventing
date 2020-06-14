@@ -7,6 +7,7 @@ using AutoMapper.QueryableExtensions;
 using Common.Exceptions;
 using Domain.DTOs;
 using Domain.DTOs.Events;
+using Domain.DTOs.Tags;
 using Domain.Entities;
 using Domain.Entities.Users;
 using Domain.Helpers;
@@ -32,9 +33,7 @@ namespace Domain.Services
         public async Task<PagedResultDTO<EventDTO>> GetUserEvents(PaginationRequest request, string userId)
         {
             var events = await _dbContext.Events
-                .Include(e => e.ApplicationUser)
-                .Include(e => e.EventTags)
-                .ThenInclude(e => e.Tag)
+                .GetEventsWithJoinedData()
                 .Where(e => e.ApplicationUser.Id == userId)
                 .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
                 .GetPagedAsync(request);
@@ -44,9 +43,7 @@ namespace Domain.Services
         public async Task<PagedResultDTO<EventDTO>> GetAllEvents(PaginationRequest request)
         {
             var events = await _dbContext.Events
-                .Include(e => e.ApplicationUser)
-                .Include(e => e.EventTags)
-                .ThenInclude(e => e.Tag)
+                .GetEventsWithJoinedData()
                 .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
                 .GetPagedAsync(request);
             return events;
@@ -54,14 +51,8 @@ namespace Domain.Services
 
         public async Task<EventDTO> GetEventById(int eventId)
         {
-            var ev = await _dbContext.Events
-                .Include(e => e.ApplicationUser)
-                .Include(e => e.EventTags)
-                .ThenInclude(e => e.Tag)
-                .Where(e => e.Id == eventId)
-                .ProjectTo<EventDTO>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync();
-            return ev;
+            var ev = await GetEventByIdFromDb(eventId);
+            return _mapper.Map<EventDTO>(ev);
         }
 
         public async Task<EventDTO> CreateEvent(CreateEventDTO createEventDto, string userId)
@@ -89,14 +80,45 @@ namespace Domain.Services
             }
         }
 
-        public Task UpdateEvent(UpdateEventDTO updateEventDto, string userId)
+        public async Task UpdateEvent(UpdateEventDTO updateEventDto, int eventId, string userId)
         {
-            throw new System.NotImplementedException();
+            var eventInDb = await GetEventByIdFromDb(eventId);
+            if (eventInDb.ApplicationUser.Id != userId)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 403,
+                    Value = "You are not authorized to update this event!"
+                };
+            }
+
+            _mapper.Map(updateEventDto, eventInDb);
+            var tagIDsInDb = _mapper.Map<List<int>>(eventInDb.EventTags);
+            var addedTags = updateEventDto.TagIDs.Except(tagIDsInDb);
+            return;
         }
 
         public Task DeleteEvent(int eventId, string userId)
         {
             throw new System.NotImplementedException();
+        }
+        
+        public async Task<Events> GetEventByIdFromDb(int eventId)
+        {
+            var ev = await _dbContext.Events
+                .GetEventsWithJoinedData()
+                .Where(e => e.Id == eventId)
+                .FirstOrDefaultAsync();
+            
+            if (ev is null)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "Event not found!"
+                };
+            }
+            return ev;
         }
     }
 }

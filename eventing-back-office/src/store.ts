@@ -10,11 +10,13 @@ import { createWrapper, Context, HYDRATE } from 'next-redux-wrapper';
 import authReducer from 'slices/auth/authSlice';
 import globalReducer from 'slices/global/globalSlice';
 import usersReducer from 'slices/users/usersSlice';
+import eventsReducer from 'slices/events/eventsSlice';
 
 const rootReducer = combineReducers({
+  global: globalReducer,
   auth: authReducer,
   users: usersReducer,
-  global: globalReducer,
+  events: eventsReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
