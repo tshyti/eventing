@@ -81,7 +81,7 @@ namespace Domain.Services
         }
 
         public async Task UpdateEvent(UpdateEventDTO updateEventDto, int eventId, string userId)
-        {
+        { 
             var eventInDb = await GetEventByIdFromDb(eventId);
             if (eventInDb.ApplicationUser.Id != userId)
             {
@@ -93,9 +93,27 @@ namespace Domain.Services
             }
 
             _mapper.Map(updateEventDto, eventInDb);
-            var tagIDsInDb = _mapper.Map<List<int>>(eventInDb.EventTags);
-            var addedTags = updateEventDto.TagIDs.Except(tagIDsInDb);
-            return;
+            var eventTagsToUpdate = _mapper.Map<List<EventTags>>(updateEventDto.TagIDs);
+            
+            var tagsToAdd = eventTagsToUpdate.Except(eventInDb.EventTags).ToList();
+            tagsToAdd.ForEach(et => et.Eventid = eventInDb.Id);
+            var tagsToRemove = eventInDb.EventTags.Except(eventTagsToUpdate).ToList();
+
+            try
+            {
+                _dbContext.EventTags.RemoveRange(tagsToRemove);
+                await _dbContext.EventTags.AddRangeAsync(tagsToAdd);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new HttpResponseException
+                {
+                    Status = 404,
+                    Value = "Some sent data could not be found"
+                };
+            }
+            
         }
 
         public Task DeleteEvent(int eventId, string userId)
