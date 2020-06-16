@@ -96,7 +96,7 @@ namespace API {
             });
 
             services.AddDbContext<EventingContext> (options => {
-                options.UseNpgsql (Environment.GetEnvironmentVariable ("CONNECTION_STRING"));
+                options.UseSqlServer(Environment.GetEnvironmentVariable ("CONNECTION_STRING"));
             });
 
             services.AddIdentity<ApplicationUser, ApplicationRole> (options => {

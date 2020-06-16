@@ -52,22 +52,22 @@ namespace Domain
                     .WithMany(e => e.EventTags)
                     .HasForeignKey(x => x.Eventid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("EventTags_eventid_fkey");
+                    .HasConstraintName("eventtags_eventid_fkey");
 
                 entity.HasOne(d => d.Tag)
                     .WithMany(e => e.EventTags)
                     .HasForeignKey(x => x.Tagid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("EventTags_tagid_fkey");
+                    .HasConstraintName("eventtags_tagid_fkey");
             });
 
             modelBuilder.Entity<Events>(entity =>
             {
-                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.CreatedBy).IsRequired();
 
-                entity.Property(e => e.CreatedOn).HasDefaultValueSql("now()");
+                entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Description).HasMaxLength(500);
 
@@ -79,7 +79,9 @@ namespace Domain
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Price).HasColumnType("money");
+                entity.Property(e => e.Price)	
+                    .HasColumnType("decimal(19, 2)")	
+                    .HasDefaultValueSql("((10))");
 
                 entity.HasOne(d => d.ApplicationUser)
                     .WithMany(p => p.Events)
@@ -90,9 +92,9 @@ namespace Domain
 
             modelBuilder.Entity<Tags>(entity =>
             {
-                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.CreatedOn).HasDefaultValueSql("now()");
+                entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -121,6 +123,7 @@ namespace Domain
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("userevents_userid_fkey");
             });
+            
 
             OnModelCreatingPartial(modelBuilder);
         }

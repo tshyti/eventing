@@ -58,12 +58,11 @@ namespace Domain.Services
         public async Task<EventDTO> CreateEvent(CreateEventDTO createEventDto, string userId)
         {
             var eventToCreate = _mapper.Map<Events>(createEventDto);
-            eventToCreate.CreatedBy = userId;
+            eventToCreate.CreatedBy = userId; ;
             try
             {
                 await _dbContext.Events.AddAsync(eventToCreate);
-
-                var eventTagsToCreate = _mapper.Map<List<EventTags>>(createEventDto.TagIDs);
+                var eventTagsToCreate = _mapper.Map<List<EventTags>>(createEventDto.TagIDs.Distinct());
                 eventTagsToCreate.ForEach(e => e.Event = eventToCreate);
                 await _dbContext.EventTags.AddRangeAsync(eventTagsToCreate);
 
