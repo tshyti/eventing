@@ -3,15 +3,17 @@ version: "3"
 services:
   eventing-api:
     build: EventingNetCore
+    image: eventing.azurecr.io/eventing-net-core-api
     container_name: eventing-net-core-api
     ports:
       - 8080:8080
     env_file:
       - EventingNetCore/.env
-   eventing-bo:
-     build: eventing-back-office
-     container_name: eventing-back-office
-     ports:
-       - 8090:3030
-     depends_on:
-       - eventing-api
+  eventing-bo:
+    build: eventing-back-office
+    image: eventing.azurecr.io/eventing-back-office
+    container_name: eventing-back-office
+    ports:
+      - 8090:3030
+    depends_on:
+      - eventing-api
