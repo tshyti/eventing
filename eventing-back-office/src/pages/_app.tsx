@@ -45,7 +45,7 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     if (didUpdate) {
       axios.interceptors.request.use((req) => {
-        req.headers.Authorization = `Bearer ${userToken}`;
+        req.headers.Authorization = `bearer ${userToken}`;
         return req;
       });
     }

@@ -20,6 +20,8 @@ export function loginUser(payload: UserRequest): AppThunk {
       localStorage.setItem('user', JSON.stringify(user));
       dispatch(loginUserSuccess(user));
 
+      axios.defaults.headers.common = { Authorization: `bearer ${user.token}` };
+
       Router.replace(routeRedirectsFromLogin[RoleNamesEnum[user.role]]);
     } catch (e) {
       const {
