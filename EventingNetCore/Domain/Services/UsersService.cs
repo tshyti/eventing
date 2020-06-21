@@ -42,9 +42,8 @@ namespace Domain.Services
             var users = await _dbContext.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .ProjectTo<UserDTO>(_mapper.ConfigurationProvider)
                 .GetPagedAsync(request);
-            return users;
+            return _mapper.Map<PagedResultDTO<ApplicationUser>, PagedResultDTO<UserDTO>>(users);
         }
 
         public async Task<UserDTO> GetUserById(string id)
